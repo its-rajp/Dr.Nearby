@@ -1,0 +1,84 @@
+<!-- dr-nearby/lab-test.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Book Lab Tests</title>
+  <link rel="stylesheet" href="../CSS/Style.css" />
+  <link rel="stylesheet" href="../CSS/forms.css" />
+  <style>
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.2rem;
+      margin: 1.5rem 0;
+    }
+    .test-card {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      background: white;
+    }
+    .test-card h3 {
+      color: #007bff;
+      margin: 0 0 0.5rem;
+    }
+    .booking-form {
+      margin-top: 2rem;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../search_doctor.html">Find Doctor</a>
+      <a href="lab-test.html">Lab Tests</a>
+      <a href="../Profile.html">My Profile</a>
+      <a href="#" onclick="logoutUser(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Book Lab Tests</h2>
+    <div id="message"></div>
+
+    <h3>Available Tests</h3>
+    <div class="test-grid" id="testsContainer">
+      <p>Loading lab tests...</p>
+    </div>
+
+    <div class="booking-form">
+      <h3>Select Test & Book</h3>
+      <form id="labBookingForm">
+        <div class="form-group">
+          <label for="test">Test *</label>
+          <select id="test" required>
+            <option value="">Choose a test</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="date">Preferred Date *</label>
+          <input type="date" id="date" required />
+        </div>
+        <div class="form-group">
+          <label for="address">Home Address *</label>
+          <textarea id="address" rows="3" required placeholder="Enter full address for sample collection"></textarea>
+        </div>
+        <button type="submit">Book Test</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/lab-tests.js"></script>
+</body>
+</html>

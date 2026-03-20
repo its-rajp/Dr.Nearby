@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Booking Confirmed - Dr.Nearby</title>
+  <link rel="stylesheet" href="../CSS/Style.css" />
+  <style>
+    .confirmation-container {
+      max-width: 600px;
+      margin: 4rem auto;
+      text-align: center;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .success-icon {
+      font-size: 4rem;
+      color: #28a745;
+      margin-bottom: 1rem;
+    }
+    .details-box {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 2rem 0;
+      text-align: left;
+    }
+    .details-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.8rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .details-row:last-child {
+      border-bottom: none;
+    }
+    .btn-home {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    .btn-home:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="confirmation-container">
+    <div class="success-icon">✅</div>
+    <h2>Booking Confirmed!</h2>
+    <p>Your lab test has been successfully booked.</p>
+    
+    <div class="details-box" id="detailsBox">
+      <p>Loading details...</p>
+    </div>
+
+    <a href="../index.html" class="btn-home">Return to Home</a>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('bookingId');
+        
+        if (!bookingId) {
+            document.getElementById('detailsBox').innerHTML = '<p style="color:red">Booking ID missing.</p>';
+            return;
+        }
+
+        try {
+            // Fetch booking details
+            const response = await fetchWithAuth(`${API_BASE_URL}/lab-tests/bookings/${bookingId}`);
+            const data = await response.json();
+            
+            if (data.success && data.booking) {
+                const b = data.booking;
+                document.getElementById('detailsBox').innerHTML = `
+                    <div class="details-row">
+                        <strong>Booking ID:</strong>
+                        <span>${b._id}</span>
+                    </div>
+                    <div class="details-row">
+                        <strong>Test Name:</strong>
+                        <span>${b.testName}</span>
+                    </div>
+                    <div class="details-row">
+                        <strong>Transaction ID:</strong>
+                        <span>${b.transactionId || '-'}</span>
+                    </div>
+                     <div class="details-row">
+                        <strong>Patient Name:</strong>
+                        <span>${b.patientName}</span>
+                    </div>
+                    <div class="details-row">
+                        <strong>Date:</strong>
+                        <span>${new Date(b.date).toLocaleDateString()} ${b.time}</span>
+                    </div>
+                    <div class="details-row">
+                        <strong>Collection:</strong>
+                        <span>${b.homeCollection ? 'Home' : 'Lab'}</span>
+                    </div>
+                    ${b.homeCollection ? `
+                    <div class="details-row">
+                        <strong>Address:</strong>
+                        <span style="max-width: 60%; text-align: right;">${b.address}</span>
+                    </div>` : ''}
+                    <div class="details-row">
+                        <strong>Amount Paid:</strong>
+                        <span>₹${b.amount}</span>
+                    </div>
+                    <div class="details-row">
+                        <strong>Payment Method:</strong>
+                        <span style="text-transform: uppercase;">${b.paymentMethod || '-'}</span>
+                    </div>
+                `;
+            } else {
+                document.getElementById('detailsBox').innerHTML = '<p>Failed to load booking details.</p>';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('detailsBox').innerHTML = '<p>Error loading booking details.</p>';
+        }
+    });
+  </script>
+</body>
+</html>

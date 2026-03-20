@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Dr.Nearby</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        #profile-details {
+            background-color: #f0f0f0;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        #profile-form {
+            display: none; /* Initially hide the edit form */
+            background-color: #f0f0f0;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        #profile-form label {
+            display: block;
+            margin-bottom: 0.2rem;
+            font-weight: bold;
+        }
+        #profile-form input,
+        #profile-form textarea {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        #profile-form button {
+            background-color: #0000ff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+        #medical-history {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        #medical-history h2 {
+            margin-top: 0;
+        }
+        .history-item {
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        #edit-profile-button,
+        #save-profile-button,
+        #cancel-edit-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        #cancel-edit-button {
+            background-color: #ccc;
+            color: black;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dr.Nearby</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="search_doctor.html">Find a Doctor</a>
+            <a href="profile.html">My Profile</a>
+            <a href="#" onclick="logoutUser(); return false;">Logout</a>
+        </nav>
+    </header>
+    <main>
+        <section id="profile-details">
+            <h2>My Profile</h2>
+            <div id="message"></div>
+            <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                <div style="position: relative; margin-right: 20px;">
+                    <img id="display-photo" src="https://via.placeholder.com/150?text=User" alt="Profile Photo" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #007bff;">
+                    <button id="upload-photo-btn" style="position: absolute; bottom: 0; right: 0; background: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center;">📷</button>
+                    <input type="file" id="photo-upload-input" accept="image/png, image/jpeg, image/gif" style="display: none;">
+                </div>
+                <div>
+                    <h3 id="display-name-header" style="margin: 0; font-size: 1.5rem;">Loading...</h3>
+                    <p id="display-role" style="margin: 5px 0; color: #666;">Patient</p>
+                </div>
+            </div>
+            
+            <p><strong>Name:</strong> <span id="display-name">Loading...</span></p>
+            <p><strong>Email:</strong> <span id="display-email">Loading...</span></p>
+            <p><strong>Phone:</strong> <span id="display-phone"></span></p>
+            <p><strong>Date of Birth:</strong> <span id="display-dob"></span></p>
+            <p><strong>Blood Group:</strong> <span id="display-blood-group">N/A</span></p>
+            <button id="edit-profile-button">Edit Profile</button>
+        </section>
+        <section id="profile-form">
+            <h2>Edit Profile</h2>
+            <form id="editForm">
+                <label for="edit-name">Name:</label>
+                <input type="text" id="edit-name">
+                <label for="edit-email">Email:</label>
+                <input type="email" id="edit-email">
+                <label for="edit-phone">Phone:</label>
+                <input type="tel" id="edit-phone">
+                <label for="edit-dob">Date of Birth:</label>
+                <input type="date" id="edit-dob">
+                <label for="edit-blood-group">Blood Group:</label>
+                <select id="edit-blood-group" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;">
+                    <option value="">Select Blood Group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+                <button type="submit" id="save-profile-button">Save Changes</button>
+                <button type="button" id="cancel-edit-button">Cancel</button>
+            </form>
+        </section>
+        <section id="medical-history">
+            <h2>Medical History</h2>
+            <button id="edit-medical-history-button" style="background-color: #007bff; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; margin-bottom: 1rem;">Edit Medical History</button>
+            
+            <!-- View Mode -->
+            <div id="medical-history-view">
+                <div class="history-item">
+                    <h3>Allergies</h3>
+                    <p id="display-allergies">Loading...</p>
+                </div>
+                <div class="history-item">
+                    <h3>Current Medications</h3>
+                    <p id="display-medications">Loading...</p>
+                </div>
+                <div class="history-item">
+                    <h3>Past Conditions</h3>
+                    <p id="display-conditions">Loading...</p>
+                </div>
+            </div>
+
+            <!-- Edit Mode -->
+            <div id="medical-history-form" style="display: none;">
+                <form id="medicalHistoryForm" action="#" method="post">
+                    <div class="history-item">
+                        <label for="edit-allergies" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Allergies:</label>
+                        <textarea id="edit-allergies" rows="3" style="width: 100%; padding: 0.5rem; margin-bottom: 1rem;"></textarea>
+                    </div>
+                    <div class="history-item">
+                        <label for="edit-medications" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Current Medications:</label>
+                        <textarea id="edit-medications" rows="3" style="width: 100%; padding: 0.5rem; margin-bottom: 1rem;"></textarea>
+                    </div>
+                    <div class="history-item">
+                        <label for="edit-conditions" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Past Conditions:</label>
+                        <textarea id="edit-conditions" rows="3" style="width: 100%; padding: 0.5rem; margin-bottom: 1rem;"></textarea>
+                    </div>
+                    <button type="submit" style="background-color: #007bff; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; margin-right: 0.5rem;">Save Changes</button>
+                    <button type="button" id="cancel-medical-history-button" style="background-color: #ccc; color: black; border: none; padding: 0.5rem 1rem; cursor: pointer;">Cancel</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Dr.Nearby</p>
+    </footer>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/profile.js"></script>
+</body>
+</html>

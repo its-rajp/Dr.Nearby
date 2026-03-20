@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Booking Confirmed</title>
+  <link rel="stylesheet" href="CSS/Style.css" />
+  <style>
+    .confirmation-container {
+      max-width: 600px;
+      margin: 4rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .success-icon {
+      font-size: 4rem;
+      color: #28a745;
+      margin-bottom: 1rem;
+    }
+    .receipt-box {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 2rem 0;
+      text-align: left;
+      border: 1px dashed #ccc;
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      color: #555;
+    }
+    .btn-home {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .btn-home:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby</h1>
+  </header>
+
+  <main>
+    <div class="confirmation-container">
+      <div class="success-icon">✅</div>
+      <h2>Payment Successful!</h2>
+      <p>Your appointment has been booked and sent for doctor approval.</p>
+      
+      <div class="receipt-box" id="receipt">
+        <!-- Details injected by JS -->
+        <p>Loading receipt...</p>
+      </div>
+
+      <a href="index.html" class="btn-home">Go to Home</a>
+      <a href="consultation/consultation.html" class="btn-home" style="background: white; color: #007bff; border: 1px solid #007bff; margin-left: 10px;">View My Consultations</a>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const receiptData = localStorage.getItem('lastReceipt');
+        if (receiptData) {
+            const data = JSON.parse(receiptData);
+            document.getElementById('receipt').innerHTML = `
+                <div class="receipt-row"><strong>Transaction ID:</strong> <span>${data.txnId}</span></div>
+                <div class="receipt-row"><strong>Date:</strong> <span>${new Date().toLocaleDateString()}</span></div>
+                <div class="receipt-row"><strong>Amount Paid:</strong> <span>₹${data.amount}</span></div>
+                <div class="receipt-row"><strong>Doctor:</strong> <span>${data.doctorName || 'Dr. Nearby'}</span></div>
+                <hr>
+                <div class="receipt-row"><strong>Status:</strong> <span style="color:green">Paid & Pending Approval</span></div>
+            `;
+        } else {
+            document.getElementById('receipt').innerHTML = '<p>No recent transaction found.</p>';
+        }
+    });
+  </script>
+</body>
+</html>

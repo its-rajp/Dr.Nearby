@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Gate - Dr.Nearby</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .gate-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .gate-card h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+        .gate-card p {
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        .btn-disabled {
+            background-color: #bdc3c7;
+            color: #7f8c8d;
+            cursor: not-allowed;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .platform-icon {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="gate-card" id="gateCard">
+        <div class="spinner" id="loader"></div>
+        <h2 id="statusTitle">Loading...</h2>
+        <p id="statusMessage">Please wait while we connect you to the consultation.</p>
+        <button id="actionBtn" class="btn btn-disabled" disabled>Connecting...</button>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const consultationId = urlParams.get('id');
+            const gateCard = document.getElementById('gateCard');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            const actionBtn = document.getElementById('actionBtn');
+            const loader = document.getElementById('loader');
+
+            if (!consultationId) {
+                showError('Invalid Consultation ID');
+                return;
+            }
+
+            // Detect Role
+            const patientToken = localStorage.getItem('token');
+            const doctorToken = localStorage.getItem('doctorToken');
+            const token = doctorToken || patientToken;
+            const isDoctor = !!doctorToken;
+
+            if (!token) {
+                showError('Please login to access this meeting.');
+                setTimeout(() => window.location.href = isDoctor ? 'DOCTOR INTERFACE/doctor-login.html' : 'user-login.html', 3000);
+                return;
+            }
+
+            try {
+                // Fetch Consultation Details
+                const response = await fetch(`${API_BASE_URL}/consultations/${consultationId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (!data.success || !data.consultation) throw new Error(data.message || 'Failed to load consultation');
+                
+                const consultation = data.consultation;
+                loader.style.display = 'none';
+
+                // Check if meeting has been joined before (Backend + LocalStorage)
+                // Backend 'HasJoined' now means 'Has Exhausted All Accesses (2)'
+                const backendExhausted = isDoctor ? consultation.doctorHasJoined : consultation.patientHasJoined;
+                
+                // Use a counter for local storage to support 2 accesses
+                const storageKey = isDoctor ? `join_count_doctor_${consultationId}` : `join_count_patient_${consultationId}`;
+                const localCount = parseInt(localStorage.getItem(storageKey) || '0');
+                const localExhausted = localCount >= 2;
+                
+                const isExhausted = backendExhausted || localExhausted;
+
+                // Payment Option Removed - Payment is handled during pre-booking
+
+                
+                // Helper to extract URL from text (handles cases where full invite is pasted)
+                const extractUrl = (text) => {
+                    if (!text) return '';
+                    // Look for http/https links
+                    const urlRegex = /(https?:\/\/[^\s]+)/;
+                    const match = text.match(urlRegex);
+                    return match ? match[0] : text;
+                };
+
+                if (consultation.meetLink) {
+                    const cleanLink = extractUrl(consultation.meetLink);
+
+                    if (isExhausted) {
+                        statusTitle.textContent = 'Access Expired';
+                        statusMessage.textContent = isDoctor 
+                            ? 'You have already started this session. Access is limited to two times.'
+                            : 'You have already joined this session. Access is limited to two times.';
+                        actionBtn.textContent = 'Meeting Ended';
+                        actionBtn.classList.add('btn-disabled');
+                        actionBtn.classList.remove('btn-primary');
+                        actionBtn.disabled = true;
+                    } else {
+                        statusTitle.textContent = isDoctor ? 'Start Meeting' : 'Join Meeting';
+                        statusMessage.textContent = (isDoctor 
+                            ? 'The meeting link is ready. Click below to start the session.' 
+                            : 'The doctor is ready. Click below to join the session.') + ' (Two-time access only)';
+                        
+                        actionBtn.textContent = isDoctor ? 'Start Meeting' : 'Join Meeting';
+                        actionBtn.classList.remove('btn-disabled');
+                        actionBtn.classList.add('btn-primary');
+                        actionBtn.disabled = false;
+                        
+                        actionBtn.onclick = async () => {
+                            // Pre-open window to bypass popup blockers
+                            const meetingWindow = window.open('', '_blank');
+                            if (meetingWindow) {
+                                meetingWindow.document.write('<h1>Connecting to meeting...</h1><p>Please wait while we verify your access.</p>');
+                            }
+
+                            try {
+                                actionBtn.textContent = 'Joining...';
+                                actionBtn.disabled = true;
+
+                                // Call Backend to Join
+                                const joinRes = await fetch(`${API_BASE_URL}/consultations/join`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({
+                                        consultationId: consultationId,
+                                        role: isDoctor ? 'doctor' : 'patient'
+                                    })
+                                });
+                                
+                                const joinData = await joinRes.json();
+                                if (!joinData.success) {
+                                    if (meetingWindow) meetingWindow.close();
+                                    alert(joinData.message);
+                                    location.reload();
+                                    return;
+                                }
+
+                                // Increment local count
+                                const newCount = localCount + 1;
+                                localStorage.setItem(storageKey, newCount.toString());
+                                
+                                // If the link is "webrtc", use our internal video call page
+                                if (cleanLink.toLowerCase() === 'webrtc' || cleanLink === 'internal') {
+                                    if (meetingWindow) {
+                                        meetingWindow.location.href = `video-call.html?room=${consultationId}&role=${isDoctor ? 'doctor' : 'patient'}`;
+                                    } else {
+                                        window.location.href = `video-call.html?room=${consultationId}&role=${isDoctor ? 'doctor' : 'patient'}`;
+                                    }
+                                } else {
+                                    // Otherwise, redirect to the provided external link
+                                    if (meetingWindow) {
+                                        meetingWindow.location.href = cleanLink;
+                                    } else {
+                                        window.location.href = cleanLink;
+                                    }
+                                }
+
+                                // Update UI Immediately
+                                actionBtn.textContent = 'Joined';
+                                actionBtn.classList.add('btn-disabled');
+                                actionBtn.classList.remove('btn-primary');
+                                actionBtn.disabled = true;
+                                statusTitle.textContent = 'Access Expired';
+                                statusMessage.textContent = isDoctor 
+                                    ? 'You have already started this session. Access is limited to two times.'
+                                    : 'You have already joined this session. Access is limited to two times.';
+                                
+                                // Reload page to ensure state persistence
+                                setTimeout(() => location.reload(), 1000);
+                            } catch (err) {
+                                console.error('Join error:', err);
+                                if (meetingWindow) meetingWindow.close();
+                                alert('Failed to join meeting. Please check your connection.');
+                                actionBtn.disabled = false;
+                                actionBtn.textContent = isDoctor ? 'Start Meeting' : 'Join Meeting';
+                            }
+                        };
+                    }
+                } else {
+                    statusTitle.textContent = 'Meeting Not Ready';
+                    statusMessage.textContent = 'The meeting link has not been generated yet. Please wait for the admin to schedule it.';
+                    actionBtn.textContent = 'Refresh Status';
+                    actionBtn.classList.remove('btn-disabled');
+                    actionBtn.classList.add('btn-primary');
+                    actionBtn.disabled = false;
+                    actionBtn.onclick = () => location.reload();
+                }
+
+            } catch (error) {
+                console.error(error);
+                showError('Error loading meeting details.');
+            }
+
+            function showError(msg) {
+                loader.style.display = 'none';
+                statusTitle.textContent = 'Error';
+                statusMessage.textContent = msg;
+                statusMessage.style.color = 'red';
+                actionBtn.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

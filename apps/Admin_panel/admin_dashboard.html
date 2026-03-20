@@ -1,0 +1,180 @@
+<!-- dr-nearby/admin/admin-dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Admin Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby Admin</h1>
+    <nav>
+      <a href="admin-dashboard.html">Dashboard</a>
+      <a href="manage-user.html">Manage Users</a>
+      <a href="#" onclick="logout(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Admin Dashboard</h2>
+
+    <div class="dashboard-section">
+      <h3>Users</h3>
+      <button class="add-btn" onclick="openModal('user')">Add User</button>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Registered</th>
+            <th>Last Login</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Doctors</h3>
+      <button class="add-btn" onclick="openModal('doctor')">Add Doctor</button>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Specialization</th>
+            <th>Password</th>
+            <th>Registered</th>
+            <th>Last Login</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="doctorsTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Appointments</h3>
+      <button class="add-btn" onclick="openModal('appointment')">Add Appointment</button>
+      <table>
+        <thead>
+          <tr><th>#</th><th>User</th><th>Doctor</th><th>Date</th><th>Time</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="appointmentsTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Second Opinion / Link Assignment</h3>
+      <p>Appointments confirmed by doctors needing meeting links.</p>
+      <button class="add-btn" onclick="loadConsultations()">Refresh</button>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th><th>Action</th></tr>
+        </thead>
+        <tbody id="secondOpinionTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Active Consultations</h3>
+      <button class="add-btn" onclick="loadConsultations()">Refresh</button>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Patient</th><th>Doctor</th><th>Status</th><th>Link</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="consultationsTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Medicine Orders</h3>
+      <button class="add-btn" onclick="loadMedicineOrders()">Refresh</button>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>UPI ID</th>
+              <th>Transaction ID</th>
+              <th>Order Date</th>
+              <th>Delivery By</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="medicineOrdersTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Lab Test Bookings</h3>
+      <button class="add-btn" onclick="loadLabBookings()">Refresh</button>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>Patient</th>
+              <th>Test</th>
+              <th>Date & Time</th>
+              <th>Type</th>
+              <th>Address</th>
+              <th>Amount</th>
+              <th>Transaction ID</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="labBookingsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="dashboard-section">
+        <h3>User Health Records</h3>
+        <button class="add-btn" onclick="loadAllHealthRecords()">Refresh</button>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>File</th>
+              </tr>
+            </thead>
+            <tbody id="healthRecordsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h3 id="modalTitle"></h3>
+        <form id="modalForm"></form>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/admin.js"></script>
+</body>
+</html>

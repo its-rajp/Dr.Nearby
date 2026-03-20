@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Health Records</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/forms.css" />
+  <style>
+    .records-list { margin: 1.5rem 0; }
+    .record-card {
+      background: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid #007bff;
+      position: relative;
+    }
+    .record-card h3 { margin: 0 0 0.5rem; }
+    .record-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+    }
+    .btn-share {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+    .btn-share:hover { background-color: #218838; }
+    
+    /* Share Modal */
+    .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 1000; 
+        left: 0;
+        top: 0;
+        width: 100%; 
+        height: 100%; 
+        overflow: auto; 
+        background-color: rgba(0,0,0,0.5); 
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; 
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 500px;
+        border-radius: 8px;
+    }
+    .close-modal {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .close-modal:hover { color: black; }
+    .upload-section { margin-top: 2rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="search_doctor.html">Find Doctor</a>
+      <a href="health-Record.html">Health Records</a>
+      <a href="profile.html">My Profile</a>
+      <a href="#" onclick="logoutUser(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>My Health Records</h2>
+    <div id="message"></div>
+
+    <div class="records-list">
+      <h3>Medical History</h3>
+      <div id="recordsContainer">
+        <p>Loading health records...</p>
+      </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeShareModal()">&times;</span>
+            <h3>Share Document with Doctor</h3>
+            <p id="shareDocTitle" style="margin-bottom:15px; color:#666;"></p>
+            <div class="form-group">
+                <label for="doctorSearch">Type Doctor's Name</label>
+                <input type="text" id="doctorSearch" placeholder="Type to search doctor..." oninput="searchDoctors(this.value)" style="width:100%; padding:8px;">
+                <div id="doctorSearchResults" style="border: 1px solid #ddd; max-height: 150px; overflow-y: auto; display: none;"></div>
+                <input type="hidden" id="selectedDoctorId">
+            </div>
+            <button onclick="confirmShare()" style="width:100%; margin-top:10px;">Send to Doctor</button>
+        </div>
+    </div>
+
+    <div class="upload-section">
+      <h3>Add New Record</h3>
+      <form id="uploadRecordForm">
+        <div class="form-group">
+            <label for="recordTitle">Title *</label>
+            <input type="text" id="recordTitle" required placeholder="e.g. Blood Test Report">
+        </div>
+        <div class="form-group">
+          <label for="recordType">Record Type *</label>
+          <select id="recordType" required>
+            <option value="">-- Select --</option>
+            <option value="Report">Lab Report</option>
+            <option value="Prescription">Prescription</option>
+            <option value="X-Ray">X-Ray/Scan</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="recordDescription">Description</label>
+          <textarea id="recordDescription" rows="3" placeholder="Additional details..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="uploadDoctorSelect">Select Doctor *</label>
+            <select id="uploadDoctorSelect" required style="width:100%; padding:8px;">
+                <option value="">-- Select Doctor --</option>
+            </select>
+            <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">You must select a doctor to share this report with.</p>
+        </div>
+        <div class="form-group">
+            <label for="recordFile">File *</label>
+            <input type="file" id="recordFile" required accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+        <button type="submit">Upload Record</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/health-records.js"></script>
+</body>
+</html>

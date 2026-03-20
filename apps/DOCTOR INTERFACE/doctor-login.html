@@ -1,0 +1,109 @@
+<!-- dr-nearby/doctor-interface/doctor-login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Doctor Login</title>
+  <link rel="stylesheet" href="../CSS/Style.css" />
+  <link rel="stylesheet" href="../CSS/forms.css" />
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby - Doctor</h1>
+    <nav>
+      <a href="../get_started.html">Back to Home</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="form-container">
+      <h2>Doctor Login</h2>
+      <div id="message"></div>
+      <form id="doctorLoginForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required />
+        </div>
+        <button type="submit">Login</button>
+        <p class="form-footer">
+          New doctor? <a href="doctor-register.html">Register here</a>
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script>
+    // Verify API_BASE_URL is loaded
+    console.log('API_BASE_URL:', typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'NOT FOUND');
+    console.log('window.API_BASE_URL:', window.API_BASE_URL || 'NOT FOUND');
+  </script>
+  <script src="../js/doctor_portal.js"></script>
+  <script>
+    // Ensure login form is initialized after scripts load
+    window.addEventListener('load', () => {
+      console.log('Page loaded, initializing login form...');
+      console.log('doctorLogin function:', typeof doctorLogin);
+      console.log('initDoctorLoginForm function:', typeof initDoctorLoginForm);
+      
+      // Small delay to ensure all scripts are ready
+      setTimeout(() => {
+        if (typeof initDoctorLoginForm === 'function') {
+          initDoctorLoginForm();
+          console.log('Login form initialized via initDoctorLoginForm');
+        } else {
+          console.warn('initDoctorLoginForm not found, using fallback');
+          // Fallback initialization
+          const form = document.getElementById('doctorLoginForm');
+          if (form && typeof doctorLogin !== 'undefined') {
+            form.addEventListener('submit', async (e) => {
+              e.preventDefault();
+              const email = document.getElementById('email').value.trim();
+              const password = document.getElementById('password').value;
+              if (!email || !password) {
+                const msgDiv = document.getElementById('message');
+                if (msgDiv) {
+                  msgDiv.textContent = 'Please fill all fields.';
+                  msgDiv.style.color = 'red';
+                  msgDiv.style.display = 'block';
+                }
+                return;
+              }
+              const res = await doctorLogin(email, password);
+              const msgDiv = document.getElementById('message');
+              if (res && res.success) {
+                if (msgDiv) {
+                  msgDiv.textContent = 'Login successful! Redirecting...';
+                  msgDiv.style.color = 'green';
+                  msgDiv.style.display = 'block';
+                }
+                setTimeout(() => {
+                  window.location.href = 'doctor-Dashboard.html';
+                }, 500);
+              } else {
+                if (msgDiv) {
+                  msgDiv.textContent = res?.message || 'Login failed';
+                  msgDiv.style.color = 'red';
+                  msgDiv.style.display = 'block';
+                }
+              }
+            });
+            console.log('Login form initialized via fallback');
+          } else {
+            console.error('Cannot initialize login form - form or doctorLogin not found');
+          }
+        }
+      }, 200);
+    });
+  </script>
+</body>
+</html>

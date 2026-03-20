@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test Doctor API</title>
+</head>
+<body>
+  <h1>Test Doctor API Connection</h1>
+  <button onclick="testAPI()">Test API Gateway</button>
+  <button onclick="testDoctorService()">Test Doctor Service</button>
+  <div id="results"></div>
+
+  <script src="../js/config.js"></script>
+  <script>
+    const API = (typeof API_BASE_URL !== 'undefined' && API_BASE_URL) || (typeof window !== 'undefined' && window.API_BASE_URL) || 'http://localhost:5501/api';
+    
+    async function testAPI() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<p>Testing API Gateway...</p>';
+      
+      try {
+        const response = await fetch(`${API}/doctor/list`);
+        const data = await response.json();
+        results.innerHTML = `<h2>API Gateway Test:</h2><pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        results.innerHTML = `<h2>API Gateway Test Failed:</h2><p>${error.message}</p>`;
+      }
+    }
+    
+    async function testDoctorService() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<p>Testing Doctor Service directly...</p>';
+      
+      try {
+        const response = await fetch('http://localhost:5503/doctor/list');
+        const data = await response.json();
+        results.innerHTML = `<h2>Doctor Service Test:</h2><pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        results.innerHTML = `<h2>Doctor Service Test Failed:</h2><p>${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>

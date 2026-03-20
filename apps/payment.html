@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Payment</title>
+  <link rel="stylesheet" href="CSS/Style.css" />
+  <link rel="stylesheet" href="CSS/forms.css" />
+  <style>
+    .payment-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .order-summary {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 6px;
+      margin-bottom: 2rem;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      color: #555;
+    }
+    .summary-total {
+      border-top: 1px solid #ddd;
+      padding-top: 1rem;
+      margin-top: 1rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #333;
+    }
+    .payment-methods {
+      margin-bottom: 2rem;
+    }
+    .method-card {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .method-card:hover, .method-card.selected {
+      border-color: #007bff;
+      background: #f0f7ff;
+    }
+    .method-card input {
+      margin-right: 1rem;
+    }
+    .btn-pay {
+      width: 100%;
+      padding: 1rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-pay:hover {
+      background: #218838;
+    }
+    .secure-badge {
+      text-align: center;
+      margin-top: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby - Secure Payment</h1>
+  </header>
+
+  <main>
+    <div class="payment-container">
+      <h2>Complete Your Booking</h2>
+      <div id="message"></div>
+      
+      <div class="order-summary" id="orderSummary">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+            <span>Consultation Fee</span>
+            <span>₹500.00</span>
+        </div>
+        <div class="summary-row">
+            <span>Service Charge</span>
+            <span>₹0.00</span>
+        </div>
+        <div class="summary-total summary-row">
+            <span>Total to Pay</span>
+            <span>₹500.00</span>
+        </div>
+      </div>
+
+      <div class="payment-methods">
+        <h3>Select Payment Method</h3>
+        <div class="method-card" onclick="selectMethod('card')">
+            <input type="radio" name="payment" id="card" checked>
+            <label for="card">
+                <strong>Credit / Debit Card</strong><br>
+                <small>Visa, Mastercard, RuPay</small>
+            </label>
+        </div>
+        <div class="method-card" onclick="selectMethod('upi')">
+            <input type="radio" name="payment" id="upi">
+            <label for="upi">
+                <strong>UPI</strong><br>
+                <small>Google Pay, PhonePe, Paytm</small>
+            </label>
+        </div>
+      </div>
+
+      <button class="btn-pay" id="payBtn" onclick="processPayment()">Pay ₹500.00</button>
+      
+      <div class="secure-badge">
+        🔒 100% Secure Payment via MockGateway
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/payment-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  api-gateway:
+    build: ../apps/api-gateway
+    ports:
+      - "5501:5501"
+    environment:
+      - PORT=5501
+     
+    depends_on:
+      - mongodb
+
+  patient-service:
+    build: ../apps/patient-service
+    ports:
+      - "5502:5502"
+    environment:
+      - PORT=5502
+      - MONGODB_URI=mongodb://mongodb:27017/dr_nearby?authSource=admin
+      - JWT_SECRET=dr_nearby_jwt_secret_v2_2025
+    depends_on:
+      - mongodb
+
+  doctor-service:
+    build: ../apps/doctor-service
+    ports:
+      - "5503:5503"
+    environment:
+      - PORT=5503
+      - MONGODB_URI=mongodb://mongodb:27017/dr_nearby?authSource=admin
+    depends_on:
+      - mongodb
+
+  admin-service:
+    build: ../apps/admin-service
+    ports:
+      - "5504:5504"
+    environment:
+      - PORT=5504
+      - MONGODB_URI=mongodb://mongodb:27017/dr_nearby?authSource=admin
+    depends_on:
+      - mongodb
+
+  consultation-service:
+    build: ../apps/consultation-service
+    ports:
+      - "5505:5505"
+    environment:
+      - PORT=5505
+      - MONGODB_URI=mongodb://mongodb:27017/dr_nearby?authSource=admin
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo_data:

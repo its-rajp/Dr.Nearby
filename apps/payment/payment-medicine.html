@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Medicine Payment</title>
+  <link rel="stylesheet" href="../CSS/Style.css" />
+  <link rel="stylesheet" href="../CSS/forms.css" />
+  <style>
+    .payment-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .order-summary {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 6px;
+      margin-bottom: 2rem;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      color: #555;
+    }
+    .summary-total {
+      border-top: 1px solid #ddd;
+      padding-top: 1rem;
+      margin-top: 1rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #333;
+    }
+    .payment-methods {
+      margin-bottom: 2rem;
+    }
+    .method-card {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .method-card:hover, .method-card.selected {
+      border-color: #007bff;
+      background: #f0f7ff;
+    }
+    .method-card input {
+      margin-right: 1rem;
+    }
+    .btn-pay {
+      width: 100%;
+      padding: 1rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-pay:hover {
+      background: #218838;
+    }
+    .secure-badge {
+      text-align: center;
+      margin-top: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    /* Medicine Specific Styles */
+    .delivery-section {
+        margin-bottom: 2rem;
+    }
+    .delivery-section textarea {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-top: 0.5rem;
+        font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby - Secure Payment</h1>
+  </header>
+
+  <main>
+    <div class="payment-container">
+      <h2>Complete Medicine Order</h2>
+      <div id="message"></div>
+      
+      <div class="order-summary" id="orderSummary">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+            <span>Order ID</span>
+            <span id="orderIdDisplay">Loading...</span>
+        </div>
+        <div class="summary-row">
+            <span>Items Total</span>
+            <span id="itemsTotal">₹0.00</span>
+        </div>
+        <div class="summary-row">
+            <span>Delivery Fee</span>
+            <span>₹0.00</span>
+        </div>
+        <div class="summary-total summary-row">
+            <span>Total to Pay</span>
+            <span>₹<span id="totalAmount">0.00</span></span>
+        </div>
+      </div>
+
+      <form id="medicinePaymentForm">
+        <div class="delivery-section">
+            <h3>Delivery Address</h3>
+            <label for="deliveryAddr">Enter full delivery address *</label>
+            <textarea id="deliveryAddr" rows="3" required placeholder="Street, City, Pincode..."></textarea>
+        </div>
+
+        <div class="payment-methods">
+            <h3>Select Payment Method</h3>
+            
+            <div class="method-card" onclick="selectMethod('upi')">
+                <input type="radio" name="paymentMethod" id="upi" value="upi" checked>
+                <label for="upi">
+                    <strong>UPI</strong><br>
+                    <small>Google Pay, PhonePe, Paytm</small>
+                </label>
+            </div>
+
+            <div class="method-card" onclick="selectMethod('card')">
+                <input type="radio" name="paymentMethod" id="card" value="card">
+                <label for="card">
+                    <strong>Credit / Debit Card</strong><br>
+                    <small>Visa, Mastercard, RuPay</small>
+                </label>
+            </div>
+
+            <div class="method-card" onclick="selectMethod('cod')">
+                <input type="radio" name="paymentMethod" id="cod" value="cod">
+                <label for="cod">
+                    <strong>Cash on Delivery</strong><br>
+                    <small>Pay when you receive</small>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-pay" id="payBtn">Pay Now</button>
+      </form>
+      
+      <div class="secure-badge">
+        🔒 100% Secure Payment via Dr.Nearby Gateway
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/payment.js"></script>
+  <script>
+    // UI Helper for selection
+    function selectMethod(value) {
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+            input.checked = (input.value === value);
+        });
+        document.querySelectorAll('.method-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        const selected = document.querySelector(`input[value="${value}"]`);
+        if(selected) selected.closest('.method-card').classList.add('selected');
+        
+        // Update button text
+        const total = document.getElementById('totalAmount').textContent;
+        const btn = document.getElementById('payBtn');
+        if (value === 'cod') {
+            btn.textContent = `Place Order (COD)`;
+        } else {
+            btn.textContent = `Pay ₹${total}`;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Ensure user is logged in
+        if (typeof protectPage === 'function') {
+            await protectPage();
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+        
+        if (!orderId) {
+            alert('Invalid Order ID');
+            window.location.href = '../Medicine_&_Lab_delivering_now/order-medicines.html';
+            return;
+        }
+
+        document.getElementById('orderIdDisplay').textContent = orderId.substring(0, 8) + '...';
+
+        // Fetch order details
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/orders/${orderId}`);
+            const data = await response.json();
+            
+            if (data.success && data.order) {
+                // Calculate total from order items
+                const total = data.order.medicines.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                document.getElementById('itemsTotal').textContent = '₹' + total.toFixed(2);
+                document.getElementById('totalAmount').textContent = total.toFixed(2);
+                
+                // Initialize button text
+                document.getElementById('payBtn').textContent = `Pay ₹${total.toFixed(2)}`;
+            } else {
+                showMessage('Failed to load order details', 'error');
+            }
+        } catch (error) {
+            console.error('Error fetching order:', error);
+            showMessage('Error loading order details', 'error');
+        }
+
+        document.getElementById('medicinePaymentForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = document.getElementById('totalAmount').textContent;
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const address = document.getElementById('deliveryAddr').value;
+
+            if (!address.trim()) {
+                showMessage('Please enter delivery address', 'error');
+                return;
+            }
+
+            // Disable button
+            const btn = document.getElementById('payBtn');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            
+            const success = await processPayment({
+                type: 'medicines',
+                orderId,
+                amount: parseFloat(amount),
+                method,
+                address
+            });
+            
+            if (success) {
+                window.location.href = 'payment-confirmation.html?orderId=' + orderId;
+            } else {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+    });
+  </script>
+</body>
+</html>

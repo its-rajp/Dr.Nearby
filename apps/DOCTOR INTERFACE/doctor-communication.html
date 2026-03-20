@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Consultations</title>
+  <link rel="stylesheet" href="../CSS/Style.css" />
+  <link rel="stylesheet" href="../CSS/forms.css" />
+  <style>
+    .communications-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .consultations-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .consultation-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .consultation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+    .consultation-header h3 {
+      margin: 0;
+      color: #007bff;
+    }
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      display: inline-block;
+    }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-active { background: #d4edda; color: #155724; }
+    .status-completed { background: #d1ecf1; color: #0c5460; }
+    .consultation-details {
+      margin: 1rem 0;
+      color: #666;
+    }
+    .consultation-details p {
+      margin: 0.5rem 0;
+    }
+    .consultation-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary { background: #007bff; color: white; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn:hover { opacity: 0.9; }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    .filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .filters select {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby - Doctor Portal</h1>
+    <nav>
+      <a href="doctor-Dashboard.html">Dashboard</a>
+      <a href="doctor-appointments.html">Appointments</a>
+      <a href="doctor-patients.html">Patients</a>
+      <a href="doctor-communication.html">Consultations</a>
+      <a href="doctor-prescriptions.html">Prescriptions</a>
+      <a href="doctor-notifications.html">Notifications</a>
+      <a href="doctor-profile-edit.html">Profile</a>
+      <a href="#" onclick="doctorLogout(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="communications-container">
+      <h2>Consultations & Communications</h2>
+      <div id="message"></div>
+
+      <div class="filters">
+        <select id="statusFilter">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Waiting for Link</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+        </select>
+        <button class="btn btn-primary" onclick="loadConsultations()">Refresh</button>
+      </div>
+
+      <div id="consultationsList">
+        <p>Loading consultations...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/doctor_portal.js"></script>
+  <script>
+    const API = (typeof API_BASE_URL !== 'undefined' && API_BASE_URL) || (typeof window !== 'undefined' && window.API_BASE_URL) || 'http://localhost:5501/api';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isAuthorized = await protectDoctorPage();
+      if (!isAuthorized) return;
+      
+      document.getElementById('statusFilter').addEventListener('change', loadConsultations);
+      await loadConsultations();
+    });
+
+    async function loadConsultations() {
+      const token = localStorage.getItem('doctorToken');
+      if (!token) return;
+
+      const doctorData = localStorage.getItem('doctorData');
+      let doctorId = null;
+      if (doctorData) {
+        try {
+          const doctor = JSON.parse(doctorData);
+          doctorId = doctor._id || doctor.id;
+        } catch (e) {
+          console.error('Error parsing doctor data:', e);
+        }
+      }
+
+      if (!doctorId) {
+        document.getElementById('consultationsList').innerHTML = '<p class="empty-state">Doctor information not found. Please login again.</p>';
+        return;
+      }
+
+      const statusFilter = document.getElementById('statusFilter').value;
+      let url = `${API}/consultations?doctorId=${doctorId}`;
+      if (statusFilter) url += `&status=${statusFilter}`;
+
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json().catch(() => ({}));
+        const container = document.getElementById('consultationsList');
+
+        if (!response.ok) {
+          // If endpoint doesn't exist, show message
+          container.innerHTML = '<p class="empty-state">Consultations feature coming soon. This will show video/chat consultations with patients.</p>';
+          return;
+        }
+
+        const consultations = data.consultations || [];
+        if (consultations.length === 0) {
+          container.innerHTML = '<p class="empty-state">No consultations found.</p>';
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="consultations-list">
+            ${consultations.map(cons => {
+              const patientName = cons.userId?.username || cons.userId?.name || 'Unknown';
+              const status = cons.status || 'pending';
+              const date = new Date(cons.date).toLocaleDateString();
+              return `
+                <div class="consultation-card">
+                  <div class="consultation-header">
+                    <h3>Consultation with ${patientName}</h3>
+                    <span class="status-badge status-${status}">${status}</span>
+                  </div>
+                  <div class="consultation-details">
+                    <p><strong>Date:</strong> ${date}</p>
+                    <p><strong>Time Slot:</strong> ${cons.timeSlot || 'N/A'}</p>
+                    <p><strong>Symptoms:</strong> ${cons.symptoms || '—'}</p>
+                    ${cons.meetLink ? `<p><strong>Meeting Link:</strong> <a href="../meeting-gate.html?id=${cons._id}" target="_blank">Open Meeting Gate</a></p>` : ''}
+                  </div>
+                  <div class="consultation-actions">
+                    ${status === 'pending' ? `<button class="btn btn-success" onclick="startConsultation('${cons._id}')">Confirm Appointment</button>` : ''}
+                    ${status === 'in_progress' ? `
+                      <button class="btn btn-primary" onclick="setupSecureCall('${cons._id}')">Start Secure Video Call</button>
+                    ` : ''}
+                    ${(status === 'approved' || status === 'confirmed') ? `<button class="btn" disabled style="background:#ccc; cursor:not-allowed;">Waiting for Admin Schedule</button>` : ''}
+                    ${(status === 'active' || (status === 'in_progress' && cons.meetLink)) && cons.meetLink ? `<a href="../meeting-gate.html?id=${cons._id}" target="_blank" class="btn btn-primary">Start Meeting</a>` : ''}
+                    ${status !== 'completed' && status !== 'cancelled' ? `<button class="btn btn-danger" onclick="endConsultation('${cons.appointmentId || ''}', '${cons._id}')">End Consultation</button>` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } catch (error) {
+        console.error('Error loading consultations:', error);
+        document.getElementById('consultationsList').innerHTML = '<p class="empty-state">Consultations feature coming soon. This will show video/chat consultations with patients.</p>';
+      }
+    }
+
+    async function setupSecureCall(consultationId) {
+      const res = await window.setConsultationLink(consultationId, 'webrtc');
+      if (res.success) {
+        showMessage('Secure Video Call set successfully!', 'success');
+        await loadConsultations();
+      } else {
+        showMessage(res.message || 'Failed to set secure call.', 'error');
+      }
+    }
+
+    async function promptMeetingLink(consultationId) {
+      const link = prompt('Enter external meeting link (e.g., Google Meet URL):');
+      if (!link) return;
+
+      const res = await window.setConsultationLink(consultationId, link);
+      if (res.success) {
+        showMessage('Meeting link updated!', 'success');
+        await loadConsultations();
+      } else {
+        showMessage(res.message || 'Failed to update meeting link.', 'error');
+      }
+    }
+
+    async function startConsultation(consultationId) {
+      const token = localStorage.getItem('doctorToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${API}/consultations/start`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ consultationId })
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.success) {
+          showMessage('Consultation started!', 'success');
+          await loadConsultations();
+        } else {
+          showMessage(data.message || 'Failed to start consultation.', 'error');
+        }
+      } catch (error) {
+        console.error('Error starting consultation:', error);
+        showMessage('Network error. Please try again.', 'error');
+      }
+    }
+
+    async function endConsultation(appointmentId, consultationId) {
+      if (!confirm('Are you sure you want to end this consultation?')) {
+        return;
+      }
+
+      const token = localStorage.getItem('doctorToken');
+      if (!token) return;
+
+      try {
+        // Use the centralized complete endpoint if appointmentId is available
+        let url = `${API}/consultations/${consultationId}`;
+        let method = 'PUT';
+        let body = { status: 'completed' };
+
+        if (appointmentId) {
+            url = `${API}/appointments/complete`;
+            method = 'POST';
+            body = { appointmentId, doctorNotes: 'Completed from Consultation Page' };
+        }
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.success) {
+          showMessage('Consultation ended successfully!', 'success');
+          await loadConsultations();
+        } else {
+          showMessage(data.message || 'Failed to end consultation.', 'error');
+        }
+      } catch (error) {
+        console.error('Error ending consultation:', error);
+        showMessage('Network error. Please try again.', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

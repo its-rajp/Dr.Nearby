@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrNearby Secure Video Call</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .header {
+            padding: 1rem;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .video-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+        #remoteVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #localVideo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            border: 2px solid #3498db;
+            object-fit: cover;
+            transform: scaleX(-1);
+            background: #222;
+            z-index: 5;
+        }
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 2rem;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 100;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .controls.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            transition: all 0.3s;
+        }
+        .btn-mute { background: #444; color: white; }
+        .btn-mute.off { background: #e74c3c; }
+        .btn-video { background: #444; color: white; }
+        .btn-video.off { background: #e74c3c; }
+        .btn-end { background: #e74c3c; color: white; width: 80px; border-radius: 30px; }
+        .btn-end:hover { background: #c0392b; }
+        
+        .status-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+        .waiting-spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h2 id="callTitle">Secure Consultation</h2>
+            <small style="color: #4CAF50;">Secure E2EE • Fee Paid: ₹500</small>
+        </div>
+        <div id="timer">00:00</div>
+    </div>
+
+    <div class="video-container" id="videoContainer">
+        <video id="remoteVideo" autoplay playsinline></video>
+        <video id="localVideo" autoplay muted playsinline></video>
+        
+        <div class="status-overlay" id="statusOverlay">
+            <div class="waiting-spinner"></div>
+            <p id="statusText">Waiting for other participant...</p>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-mute" id="muteBtn" title="Mute/Unmute">🎤</button>
+        <button class="control-btn btn-video" id="videoBtn" title="Camera On/Off">📷</button>
+        <button class="control-btn btn-end" id="endBtn" title="End Call" style="display: flex; flex-direction: column; height: auto; border-radius: 20px; padding: 10px 15px;">
+            <span>📞</span>
+            <span style="font-size: 10px; margin-top: 4px; font-weight: bold;">DECLINE</span>
+        </button>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/webrtc.js"></script>
+    <script>
+        let isMuted = false;
+        let isVideoOff = false;
+        let startTime;
+        let timerInterval;
+        let hideControlsTimeout;
+
+        const controls = document.querySelector('.controls');
+        const showControls = () => {
+            controls.classList.remove('hidden');
+            clearTimeout(hideControlsTimeout);
+            hideControlsTimeout = setTimeout(() => {
+                if (window.onRemoteStreamHandler && remoteVideo.srcObject) {
+                    controls.classList.add('hidden');
+                }
+            }, 5000);
+        };
+
+        document.body.onclick = showControls;
+        document.body.onmousemove = showControls;
+        document.body.ontouchstart = showControls;
+        document.getElementById('videoContainer').onclick = showControls;
+        document.getElementById('videoContainer').ontouchstart = showControls;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            showControls();
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('room');
+            const role = urlParams.get('role');
+            
+            if (!roomId) {
+                alert('Invalid Room ID');
+                window.close();
+                return;
+            }
+
+            const localVideo = document.getElementById('localVideo');
+            const remoteVideo = document.getElementById('remoteVideo');
+            const statusOverlay = document.getElementById('statusOverlay');
+            const statusText = document.getElementById('statusText');
+
+            window.onRemoteStreamHandler = (stream) => {
+                if (stream) {
+                    remoteVideo.srcObject = stream;
+                    statusOverlay.style.display = 'none';
+                    startTimer();
+                } else {
+                    remoteVideo.srcObject = null;
+                    statusOverlay.style.display = 'flex';
+                    statusText.textContent = 'Participant disconnected. Waiting...';
+                    stopTimer();
+                }
+            };
+
+            try {
+                const stream = await window.getLocalMedia();
+                localVideo.srcObject = stream;
+
+                window.initSignaling(roomId, window.onRemoteStreamHandler);
+                
+                statusText.textContent = 'Connected. Waiting for other participant...';
+            } catch (err) {
+                console.error(err);
+                alert('Could not access camera/microphone. Please check permissions.');
+            }
+
+            document.getElementById('muteBtn').onclick = () => {
+                isMuted = !isMuted;
+                window.toggleMic(!isMuted);
+                document.getElementById('muteBtn').classList.toggle('off', isMuted);
+                document.getElementById('muteBtn').textContent = isMuted ? '🔇' : '🎤';
+            };
+
+            document.getElementById('videoBtn').onclick = () => {
+                isVideoOff = !isVideoOff;
+                window.toggleCamera(!isVideoOff);
+                document.getElementById('videoBtn').classList.toggle('off', isVideoOff);
+                document.getElementById('videoBtn').textContent = isVideoOff ? '🚫' : '📷';
+            };
+
+            document.getElementById('endBtn').onclick = () => {
+                if (confirm('Are you sure you want to end this call?')) {
+                    window.endCall();
+                    window.location.href = 'index.html';
+                }
+            };
+        });
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const secs = (elapsed % 60).toString().padStart(2, '0');
+                document.getElementById('timer').textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+    </script>
+</body>
+</html>

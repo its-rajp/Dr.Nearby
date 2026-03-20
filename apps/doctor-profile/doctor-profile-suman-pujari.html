@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr. Suman Pujari - Cardiologist | Dr.Nearby</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/doctor-profile.css" />
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../search-doctor.html">Find Doctor</a>
+      <a href="../user-login.html">Login</a>
+      <a href="../register.html">Register</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="doctor-profile-container">
+      <div class="doctor-info">
+        <img src="../assets/images/dr-suman-pujari.jpg" alt="Dr. Suman Pujari" />
+        <h2>Dr. Suman Pujari</h2>
+        <p class="specialization">Cardiologist</p>
+        <p class="location">📍 Pune, Maharashtra</p>
+        <p class="experience">12+ years of experience</p>
+        <p class="education">MBBS, MD (Internal Medicine), DM (Cardiology)</p>
+        <p class="languages">Languages: English, Hindi, Marathi</p>
+        <button onclick="bookAppointment('60d5ec3b9c7e6a1f8c4e2f1a')">Book Appointment</button>
+        <button onclick="startConsultation('60d5ec3b9c7e6a1f8c4e2f1a')">Start Consultation</button>
+      </div>
+
+      <div class="doctor-details">
+        <h3>About</h3>
+        <p>Dr. Suman Pujari is a renowned cardiologist with expertise in interventional cardiology, hypertension, and heart failure management. She has served at top hospitals in Pune and is known for her patient-centric approach.</p>
+
+        <h3>Clinic Hours</h3>
+        <ul>
+          <li>Mon–Fri: 10:00 AM – 6:00 PM</li>
+          <li>Sat: 10:00 AM – 2:00 PM</li>
+          <li>Sun: Closed</li>
+        </ul>
+
+        <h3>Services</h3>
+        <ul>
+          <li>Echocardiography</li>
+          <li>Stress Testing</li>
+          <li>Angioplasty & Stenting</li>
+          <li>Hypertension Management</li>
+        </ul>
+
+        <h3>Patient Reviews</h3>
+        <div class="reviews">
+          <p>⭐ 4.9 (120+ reviews)</p>
+          <blockquote>"Excellent care and thorough explanations."</blockquote>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script>
+    function bookAppointment(doctorId) {
+      if (!localStorage.getItem('authToken')) {
+        alert('Please login to book an appointment.');
+        window.location.href = '../user-login.html';
+        return;
+      }
+      window.location.href = `../book-appointment.html?doctorId=${doctorId}`;
+    }
+
+    function startConsultation(doctorId) {
+      if (!localStorage.getItem('authToken')) {
+        alert('Please login to start a consultation.');
+        window.location.href = '../user-login.html';
+        return;
+      }
+      window.location.href = `../consultation/consultation.html?doctorId=${doctorId}`;
+    }
+  </script>
+</body>
+</html>

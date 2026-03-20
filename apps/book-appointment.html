@@ -1,0 +1,63 @@
+<!-- dr-nearby/book-appointment.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Book Appointment</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/forms.css" />
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="search_doctor.html">Find Doctor</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" onclick="logoutUser(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="form-container">
+      <h2>Book Appointment</h2>
+      <div id="message"></div>
+      <form id="appointmentForm">
+        <div class="form-group">
+          <label for="doctor">Doctor *</label>
+          <select id="doctor" required>
+            <option value="">Select a Doctor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="date">Date *</label>
+          <input type="date" id="date" required />
+        </div>
+        <div class="form-group">
+          <label for="time">Time *</label>
+          <input type="time" id="time" required />
+        </div>
+        <div class="form-group">
+          <label for="reason">Reason for Visit</label>
+          <textarea id="reason" rows="3"></textarea>
+        </div>
+        <div class="payment-info" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px;">
+            <h3>Payment Details</h3>
+            <p>Consultation Fee: <strong>₹500</strong></p>
+            <p><small>Payment is required to book the appointment.</small></p>
+        </div>
+        <button type="submit" style="background-color: #28a745;">Pay ₹500 & Book Appointment</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/appointments.js"></script>
+</body>
+</html>

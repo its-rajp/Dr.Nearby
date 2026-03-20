@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test Services</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2rem; }
+    .test-section { margin: 2rem 0; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; }
+    button { padding: 0.5rem 1rem; margin: 0.5rem; cursor: pointer; }
+    .success { color: green; }
+    .error { color: red; }
+    pre { background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Service Connectivity Test</h1>
+  
+  <div class="test-section">
+    <h2>API Gateway</h2>
+    <button onclick="testGateway()">Test API Gateway (Port 5501)</button>
+    <div id="gateway-result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Patient Service</h2>
+    <button onclick="testPatientService()">Test Patient Service (Port 5502)</button>
+    <div id="patient-result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Doctor Service</h2>
+    <button onclick="testDoctorService()">Test Doctor Service (Port 5503)</button>
+    <div id="doctor-result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Test Patient Login via Gateway</h2>
+    <button onclick="testPatientLogin()">Test Login Endpoint</button>
+    <div id="patient-login-result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Test Doctor Login via Gateway</h2>
+    <button onclick="testDoctorLogin()">Test Login Endpoint</button>
+    <div id="doctor-login-result"></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script>
+    const API = (typeof API_BASE_URL !== 'undefined' && API_BASE_URL) || (typeof window !== 'undefined' && window.API_BASE_URL) || 'http://localhost:5501/api';
+    
+    async function testGateway() {
+      const result = document.getElementById('gateway-result');
+      result.innerHTML = '<p>Testing...</p>';
+      try {
+        const response = await fetch('http://localhost:5501/api');
+        const data = await response.json();
+        result.innerHTML = `<p class="success">✅ API Gateway is running</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        result.innerHTML = `<p class="error">❌ API Gateway is not running: ${error.message}</p>`;
+      }
+    }
+    
+    async function testPatientService() {
+      const result = document.getElementById('patient-result');
+      result.innerHTML = '<p>Testing...</p>';
+      try {
+        const response = await fetch('http://localhost:5502/health');
+        const data = await response.json();
+        result.innerHTML = `<p class="success">✅ Patient Service is running</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        result.innerHTML = `<p class="error">❌ Patient Service is not running: ${error.message}</p>`;
+      }
+    }
+    
+    async function testDoctorService() {
+      const result = document.getElementById('doctor-result');
+      result.innerHTML = '<p>Testing...</p>';
+      try {
+        const response = await fetch('http://localhost:5503/health');
+        const data = await response.json();
+        result.innerHTML = `<p class="success">✅ Doctor Service is running</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        result.innerHTML = `<p class="error">❌ Doctor Service is not running: ${error.message}</p>`;
+      }
+    }
+    
+    async function testPatientLogin() {
+      const result = document.getElementById('patient-login-result');
+      result.innerHTML = '<p>Testing...</p>';
+      try {
+        const response = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: 'test@test.com', password: 'test123' })
+        });
+        const text = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          data = { raw: text };
+        }
+        result.innerHTML = `<p>Status: ${response.status}</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        result.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+      }
+    }
+    
+    async function testDoctorLogin() {
+      const result = document.getElementById('doctor-login-result');
+      result.innerHTML = '<p>Testing...</p>';
+      try {
+        const response = await fetch(`${API}/doctor/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: 'test@test.com', password: 'test123' })
+        });
+        const text = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          data = { raw: text };
+        }
+        result.innerHTML = `<p>Status: ${response.status}</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        result.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>

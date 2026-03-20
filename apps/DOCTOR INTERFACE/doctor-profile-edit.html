@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Edit Profile</title>
+  <link rel="stylesheet" href="../CSS/Style.css" />
+  <link rel="stylesheet" href="../CSS/forms.css" />
+  <style>
+    .profile-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .profile-form {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .form-section {
+      margin-bottom: 2rem;
+    }
+    .form-section h3 {
+      color: #007bff;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #007bff;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+      color: #333;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .form-group textarea {
+      resize: vertical;
+    }
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    .location-fields {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 1rem;
+    }
+    .languages-input {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .language-tag {
+      background: #007bff;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .language-tag button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0;
+      margin-left: 0.25rem;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-right: 1rem;
+    }
+    .btn-primary { background: #007bff; color: white; }
+    .btn-secondary { background: #6c757d; color: white; }
+    .btn:hover { opacity: 0.9; }
+    .profile-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .profile-header h2 {
+      color: #007bff;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby - Doctor Portal</h1>
+    <nav>
+      <a href="doctor-Dashboard.html">Dashboard</a>
+      <a href="doctor-appointments.html">Appointments</a>
+      <a href="doctor-patients.html">Patients</a>
+      <a href="doctor-communication.html">Consultations</a>
+      <a href="doctor-prescriptions.html">Prescriptions</a>
+      <a href="doctor-notifications.html">Notifications</a>
+      <a href="doctor-profile-edit.html">Profile</a>
+      <a href="#" onclick="doctorLogout(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="profile-container">
+      <div class="profile-header">
+        <h2>Edit Profile</h2>
+        <p>Update your professional information</p>
+      </div>
+      <div id="message"></div>
+
+      <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2rem;">
+          <div style="position: relative;">
+              <img id="profilePreview" src="https://via.placeholder.com/150?text=Dr" alt="Profile Photo" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #007bff;">
+              <button type="button" id="uploadPhotoBtn" style="position: absolute; bottom: 0; right: 0; background: #007bff; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📷</button>
+              <input type="file" id="photoInput" accept="image/png, image/jpeg, image/gif" style="display: none;">
+          </div>
+      </div>
+
+      <form id="profileForm" class="profile-form">
+        <!-- Personal Information -->
+        <div class="form-section">
+          <h3>Personal Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Full Name *</label>
+              <input type="text" id="name" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input type="email" id="email" required readonly style="background: #f8f9fa;" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone">Phone *</label>
+              <input type="tel" id="phone" required pattern="[0-9]{10}" />
+            </div>
+            <div class="form-group">
+              <label for="dob">Date of Birth *</label>
+              <input type="date" id="dob" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="gender">Gender *</label>
+            <select id="gender" required>
+              <option value="">-- Select --</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Professional Information -->
+        <div class="form-section">
+          <h3>Professional Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="specialization">Specialization *</label>
+              <input type="text" id="specialization" required />
+            </div>
+            <div class="form-group">
+              <label for="hospital">Hospital / Clinic *</label>
+              <input type="text" id="hospital" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="licenseNumber">Medical License Number *</label>
+              <input type="text" id="licenseNumber" required readonly style="background: #f8f9fa;" />
+            </div>
+            <div class="form-group">
+              <label for="experience">Years of Experience *</label>
+              <input type="number" id="experience" min="0" max="60" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="qualification">Qualifications *</label>
+            <textarea id="qualification" rows="2" required placeholder="e.g., MBBS, MD, DM"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="languages">Languages Spoken</label>
+            <div class="languages-input">
+              <input type="text" id="languageInput" placeholder="Enter language and press Enter" />
+              <div id="languagesContainer"></div>
+            </div>
+            <small>Press Enter to add a language</small>
+          </div>
+        </div>
+
+        <!-- Location Information -->
+        <div class="form-section">
+          <h3>Location Information</h3>
+          <div class="form-group">
+            <label for="address">Address *</label>
+            <input type="text" id="address" required />
+          </div>
+          <div class="location-fields">
+            <div class="form-group">
+              <label for="city">City *</label>
+              <input type="text" id="city" required />
+            </div>
+            <div class="form-group">
+              <label for="state">State *</label>
+              <input type="text" id="state" required />
+            </div>
+            <div class="form-group">
+              <label for="zipCode">ZIP Code</label>
+              <input type="text" id="zipCode" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Password Change (Optional) -->
+        <div class="form-section">
+          <h3>Change Password (Optional)</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <input type="password" id="currentPassword" />
+            </div>
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <input type="password" id="newPassword" minlength="8" />
+            </div>
+          </div>
+          <small>Leave blank if you don't want to change password</small>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" class="btn btn-secondary" onclick="window.location.href='doctor-Dashboard.html'">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/doctor_portal.js"></script>
+  <script>
+    const API = (typeof API_BASE_URL !== 'undefined' && API_BASE_URL) || (typeof window !== 'undefined' && window.API_BASE_URL) || 'http://localhost:5501/api';
+    let languages = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isAuthorized = await protectDoctorPage();
+      if (!isAuthorized) return;
+      
+      await loadProfile();
+      
+      document.getElementById('languageInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addLanguage();
+        }
+      });
+      
+      document.getElementById('profileForm').addEventListener('submit', handleProfileUpdate);
+      
+      const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
+      const photoInput = document.getElementById('photoInput');
+      
+      if (uploadPhotoBtn && photoInput) {
+          uploadPhotoBtn.addEventListener('click', () => {
+              photoInput.click();
+          });
+          
+          photoInput.addEventListener('change', async (e) => {
+              if (e.target.files && e.target.files[0]) {
+                  await handleDoctorPhotoUpload(e.target.files[0]);
+              }
+          });
+      }
+    });
+
+    async function handleDoctorPhotoUpload(file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            showMessage('File size too large. Max 5MB.', 'error');
+            return;
+        }
+
+        const token = localStorage.getItem('doctorToken');
+        if (!token) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch(`${API}/doctor/doctors/upload-photo`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showMessage('Profile photo uploaded successfully!', 'success');
+                const profilePreview = document.getElementById('profilePreview');
+                if (profilePreview) {
+                     const imgUrl = data.imageUrl.startsWith('http') ? data.imageUrl : `${API.replace('/api', '')}${data.imageUrl}`;
+                     profilePreview.src = imgUrl;
+                }
+            } else {
+                showMessage(data.message || 'Photo upload failed', 'error');
+            }
+        } catch (error) {
+            console.error('Photo upload error:', error);
+            showMessage('Network error uploading photo', 'error');
+        }
+    }
+
+    async function loadProfile() {
+      const token = localStorage.getItem('doctorToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${API}/doctor/profile`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.success && data.doctor) {
+          const doctor = data.doctor;
+          
+          document.getElementById('name').value = doctor.name || '';
+          document.getElementById('email').value = doctor.email || '';
+          document.getElementById('phone').value = doctor.phone || '';
+          document.getElementById('dob').value = doctor.dob ? new Date(doctor.dob).toISOString().split('T')[0] : '';
+          document.getElementById('gender').value = doctor.gender || '';
+          document.getElementById('specialization').value = doctor.specialization || '';
+          document.getElementById('hospital').value = doctor.hospital || '';
+          document.getElementById('licenseNumber').value = doctor.licenseNumber || '';
+          document.getElementById('experience').value = doctor.experience || 0;
+          document.getElementById('qualification').value = doctor.qualification || '';
+          
+          if (doctor.location) {
+            document.getElementById('address').value = doctor.location.address || '';
+            document.getElementById('city').value = doctor.location.city || '';
+            document.getElementById('state').value = doctor.location.state || '';
+            document.getElementById('zipCode').value = doctor.location.zipCode || '';
+          }
+          
+          languages = doctor.languages || [];
+          renderLanguages();
+          
+          if (doctor.profileImage) {
+              const imgUrl = doctor.profileImage.startsWith('http') ? doctor.profileImage : `${API.replace('/api', '')}${doctor.profileImage}`;
+              const profilePreview = document.getElementById('profilePreview');
+              if (profilePreview) profilePreview.src = imgUrl;
+          }
+        } else {
+          showMessage('Failed to load profile. Please try again.', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        showMessage('Network error. Please check your connection.', 'error');
+      }
+    }
+
+    function addLanguage() {
+      const input = document.getElementById('languageInput');
+      const lang = input.value.trim();
+      if (lang && !languages.includes(lang)) {
+        languages.push(lang);
+        input.value = '';
+        renderLanguages();
+      }
+    }
+
+    function removeLanguage(lang) {
+      languages = languages.filter(l => l !== lang);
+      renderLanguages();
+    }
+
+    function renderLanguages() {
+      const container = document.getElementById('languagesContainer');
+      container.innerHTML = languages.map(lang => `
+        <span class="language-tag">
+          ${lang}
+          <button type="button" onclick="removeLanguage('${lang}')" title="Remove">×</button>
+        </span>
+      `).join('');
+    }
+
+    async function handleProfileUpdate(e) {
+      e.preventDefault();
+      const token = localStorage.getItem('doctorToken');
+      if (!token) return;
+
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+
+      const updateData = {
+        name: document.getElementById('name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        dob: document.getElementById('dob').value,
+        gender: document.getElementById('gender').value,
+        specialization: document.getElementById('specialization').value.trim(),
+        hospital: document.getElementById('hospital').value.trim(),
+        experience: parseInt(document.getElementById('experience').value) || 0,
+        qualification: document.getElementById('qualification').value.trim(),
+        languages: languages,
+        location: {
+          address: document.getElementById('address').value.trim(),
+          city: document.getElementById('city').value.trim(),
+          state: document.getElementById('state').value.trim(),
+          zipCode: document.getElementById('zipCode').value.trim()
+        }
+      };
+
+      if (currentPassword && newPassword) {
+        updateData.currentPassword = currentPassword;
+        updateData.newPassword = newPassword;
+      }
+
+      try {
+        const response = await fetch(`${API}/doctor/profile`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updateData)
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.success) {
+          showMessage('Profile updated successfully!', 'success');
+          if (data.doctor) {
+            localStorage.setItem('doctorData', JSON.stringify(data.doctor));
+          }
+          setTimeout(() => {
+            window.location.href = 'doctor-Dashboard.html';
+          }, 1500);
+        } else {
+          showMessage(data.message || 'Failed to update profile.', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        showMessage('Network error. Please try again.', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

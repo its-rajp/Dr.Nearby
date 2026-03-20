@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Notifications</title>
+  <link rel="stylesheet" href="../CSS/Style.css" />
+  <link rel="stylesheet" href="../CSS/forms.css" />
+  <style>
+    .notifications-container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .notifications-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .notification-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .notification-card.unread {
+      border-left: 4px solid #007bff;
+      background: #f8f9ff;
+    }
+    .notification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 0.5rem;
+    }
+    .notification-header h3 {
+      margin: 0;
+      color: #007bff;
+      font-size: 1.1rem;
+    }
+    .notification-time {
+      color: #666;
+      font-size: 0.875rem;
+    }
+    .notification-body {
+      color: #333;
+      margin: 0.5rem 0;
+    }
+    .notification-type {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+      background: #e9ecef;
+      color: #495057;
+    }
+    .type-appointment { background: #d4edda; color: #155724; }
+    .type-consultation { background: #d1ecf1; color: #0c5460; }
+    .type-system { background: #fff3cd; color: #856404; }
+    .mark-read-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.25rem 0.75rem;
+      border: none;
+      border-radius: 4px;
+      background: #6c757d;
+      color: white;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .mark-read-btn:hover {
+      background: #5a6268;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    .filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .filters select {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .mark-all-read {
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby - Doctor Portal</h1>
+    <nav>
+      <a href="doctor-Dashboard.html">Dashboard</a>
+      <a href="doctor-appointments.html">Appointments</a>
+      <a href="doctor-patients.html">Patients</a>
+      <a href="doctor-communication.html">Consultations</a>
+      <a href="doctor-prescriptions.html">Prescriptions</a>
+      <a href="doctor-notifications.html">Notifications</a>
+      <a href="doctor-profile-edit.html">Profile</a>
+      <a href="#" onclick="doctorLogout(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="notifications-container">
+      <h2>Notifications</h2>
+      <div id="message"></div>
+
+      <div class="mark-all-read">
+        <button class="btn btn-primary" onclick="markAllAsRead()">Mark All as Read</button>
+      </div>
+
+      <div class="filters">
+        <select id="typeFilter">
+          <option value="">All Types</option>
+          <option value="appointment">Appointments</option>
+          <option value="consultation">Consultations</option>
+          <option value="system">System</option>
+        </select>
+        <select id="readFilter">
+          <option value="">All</option>
+          <option value="unread">Unread Only</option>
+          <option value="read">Read Only</option>
+        </select>
+        <button class="btn btn-primary" onclick="loadNotifications()">Refresh</button>
+      </div>
+
+      <div id="notificationsList">
+        <p>Loading notifications...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/doctor_portal.js"></script>
+  <script>
+    const API = (typeof API_BASE_URL !== 'undefined' && API_BASE_URL) || (typeof window !== 'undefined' && window.API_BASE_URL) || 'http://localhost:5501/api';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isAuthorized = await protectDoctorPage();
+      if (!isAuthorized) return;
+      
+      document.getElementById('typeFilter').addEventListener('change', loadNotifications);
+      document.getElementById('readFilter').addEventListener('change', loadNotifications);
+      await loadNotifications();
+    });
+
+    async function loadNotifications() {
+      const token = localStorage.getItem('doctorToken');
+      if (!token) return;
+
+      const doctorData = localStorage.getItem('doctorData');
+      let doctorId = null;
+      if (doctorData) {
+        try {
+          const doctor = JSON.parse(doctorData);
+          doctorId = doctor._id || doctor.id;
+        } catch (e) {
+          console.error('Error parsing doctor data:', e);
+        }
+      }
+
+      if (!doctorId) {
+        document.getElementById('notificationsList').innerHTML = '<p class="empty-state">Doctor information not found. Please login again.</p>';
+        return;
+      }
+
+      const typeFilter = document.getElementById('typeFilter').value;
+      const readFilter = document.getElementById('readFilter').value;
+      let url = `${API}/notifications?userId=${doctorId}`;
+      if (typeFilter) url += `&type=${typeFilter}`;
+      if (readFilter) url += `&read=${readFilter}`;
+
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json().catch(() => ({}));
+        const container = document.getElementById('notificationsList');
+
+        if (!response.ok) {
+          container.innerHTML = '<p class="empty-state">Notifications feature coming soon. This will show appointment reminders, consultation requests, and system updates.</p>';
+          return;
+        }
+
+        const notifications = data.notifications || [];
+        if (notifications.length === 0) {
+          container.innerHTML = '<p class="empty-state">No notifications found.</p>';
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="notifications-list">
+            ${notifications.map(notif => {
+              const isUnread = !notif.isRead;
+              const time = new Date(notif.timestamp).toLocaleString();
+              const type = notif.type || 'system';
+              return `
+                <div class="notification-card ${isUnread ? 'unread' : ''}">
+                  ${isUnread ? `<button class="mark-read-btn" onclick="markAsRead('${notif._id}')">Mark Read</button>` : ''}
+                  <div class="notification-header">
+                    <h3>${notif.title || 'Notification'}</h3>
+                    <span class="notification-time">${time}</span>
+                  </div>
+                  <div class="notification-body">
+                    ${notif.message || notif.text || 'No message'}
+                  </div>
+                  <span class="notification-type type-${type}">${type}</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+        document.getElementById('notificationsList').innerHTML = '<p class="empty-state">Notifications feature coming soon. This will show appointment reminders, consultation requests, and system updates.</p>';
+      }
+    }
+
+    async function markAsRead(notificationId) {
+      const token = localStorage.getItem('doctorToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${API}/notifications/${notificationId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ isRead: true })
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.success) {
+          await loadNotifications();
+        } else {
+          showMessage(data.message || 'Failed to mark notification as read.', 'error');
+        }
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+        showMessage('Network error. Please try again.', 'error');
+      }
+    }
+
+    async function markAllAsRead() {
+      const token = localStorage.getItem('doctorToken');
+      if (!token) return;
+
+      if (!confirm('Mark all notifications as read?')) {
+        return;
+      }
+
+      try {
+        const doctorData = localStorage.getItem('doctorData');
+        let doctorId = null;
+        if (doctorData) {
+          try {
+            const doctor = JSON.parse(doctorData);
+            doctorId = doctor._id || doctor.id;
+          } catch (e) {
+            console.error('Error parsing doctor data:', e);
+          }
+        }
+
+        if (!doctorId) {
+          showMessage('Doctor information not found.', 'error');
+          return;
+        }
+
+        const response = await fetch(`${API}/notifications/mark-all-read?userId=${doctorId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.success) {
+          showMessage('All notifications marked as read!', 'success');
+          await loadNotifications();
+        } else {
+          showMessage(data.message || 'Failed to mark all as read.', 'error');
+        }
+      } catch (error) {
+        console.error('Error marking all as read:', error);
+        showMessage('Network error. Please try again.', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

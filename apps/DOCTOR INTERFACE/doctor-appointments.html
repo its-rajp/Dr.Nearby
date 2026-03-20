@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - My Appointments</title>
+  <link rel="stylesheet" href="../CSS/Style.css" />
+  <link rel="stylesheet" href="../CSS/forms.css" />
+  <style>
+    .appointments-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .filters select, .filters input {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .appointments-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .appointments-table th {
+      background: #007bff;
+      color: white;
+      padding: 1rem;
+      text-align: left;
+    }
+    .appointments-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    .appointments-table tr:hover {
+      background: #f8f9fa;
+    }
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      display: inline-block;
+    }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-confirmed { background: #d4edda; color: #155724; }
+    .status-completed { background: #d1ecf1; color: #0c5460; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .btn-primary { background: #007bff; color: white; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn:hover { opacity: 0.9; }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby - Doctor Portal</h1>
+    <nav>
+      <a href="doctor-Dashboard.html">Dashboard</a>
+      <a href="doctor-appointments.html">Appointments</a>
+      <a href="doctor-patients.html">Patients</a>
+      <a href="doctor-communication.html">Consultations</a>
+      <a href="doctor-prescriptions.html">Prescriptions</a>
+      <a href="doctor-notifications.html">Notifications</a>
+      <a href="doctor-profile-edit.html">Profile</a>
+      <a href="#" onclick="doctorLogout(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="appointments-container">
+      <h2>My Appointments</h2>
+      <div id="message"></div>
+
+      <div class="filters">
+        <select id="statusFilter">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <input type="date" id="dateFilter" placeholder="Filter by date" />
+        <button class="btn btn-primary" onclick="loadAppointments()">Refresh</button>
+      </div>
+
+      <div id="appointmentsList">
+        <p>Loading appointments...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/doctor_portal.js"></script>
+  <script>
+    const API = (typeof API_BASE_URL !== 'undefined' && API_BASE_URL) || (typeof window !== 'undefined' && window.API_BASE_URL) || 'http://localhost:5501/api';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isAuthorized = await protectDoctorPage();
+      if (!isAuthorized) return;
+      
+      document.getElementById('statusFilter').addEventListener('change', loadAppointments);
+      document.getElementById('dateFilter').addEventListener('change', loadAppointments);
+      await loadAppointments();
+    });
+
+    async function loadAppointments() {
+      const token = localStorage.getItem('doctorToken');
+      if (!token) return;
+
+      const doctorData = localStorage.getItem('doctorData');
+      let doctorId = null;
+      if (doctorData) {
+        try {
+          const doctor = JSON.parse(doctorData);
+          doctorId = doctor._id || doctor.id;
+        } catch (e) {
+          console.error('Error parsing doctor data:', e);
+        }
+      }
+
+      if (!doctorId) {
+        document.getElementById('appointmentsList').innerHTML = '<p class="empty-state">Doctor information not found. Please login again.</p>';
+        return;
+      }
+
+      const statusFilter = document.getElementById('statusFilter').value;
+      const dateFilter = document.getElementById('dateFilter').value;
+      let url = `${API}/appointments?doctorId=${doctorId}`;
+      if (statusFilter) url += `&status=${statusFilter}`;
+      if (dateFilter) url += `&date=${dateFilter}`;
+
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json().catch(() => ({}));
+        const container = document.getElementById('appointmentsList');
+
+        if (!response.ok || !data.success) {
+          container.innerHTML = '<p class="empty-state">Error loading appointments. Please try again.</p>';
+          return;
+        }
+
+        const appointments = data.appointments || [];
+        if (appointments.length === 0) {
+          container.innerHTML = '<p class="empty-state">No appointments found.</p>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table class="appointments-table">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${appointments.map(apt => {
+                const patientName = apt.patientId?.username || apt.patientId?.name || 'Unknown';
+                const patientEmail = apt.patientId?.email || 'N/A';
+                const aptDate = new Date(apt.date).toLocaleDateString();
+                const status = apt.status || 'pending';
+                const paymentStatus = apt.paymentStatus || 'pending';
+                return `
+                  <tr>
+                    <td>
+                      <strong>${patientName}</strong><br>
+                      <small>${patientEmail}</small>
+                    </td>
+                    <td>${aptDate}</td>
+                    <td>${apt.time || 'N/A'}</td>
+                    <td>${apt.reason || '—'}</td>
+                    <td>
+                        <span class="status-badge status-${status}">${status.replace('_', ' ')}</span><br>
+                        <small style="color: ${paymentStatus === 'paid' ? '#28a745' : '#ffc107'}; font-weight: bold;">
+                            Payment: ${paymentStatus.toUpperCase()}
+                        </small>
+                    </td>
+                    <td>
+                      <div class="action-buttons">
+            ${(status === 'pending_approval' || status === 'pending') ? `
+                <button class="btn btn-success" onclick="approveAppointment('${apt._id}')">Approve</button>
+                <button class="btn btn-danger" onclick="rejectAppointment('${apt._id}')">Reject</button>
+            ` : ''}
+            ${(status === 'approved' || status === 'confirmed') ? `<a href="doctor-communication.html" class="btn btn-primary">Go to Consultations</a>` : ''}
+            ${status === 'scheduled' ? `<span style="color:blue; font-size:0.9em;">Scheduled</span>` : ''}
+            ${status === 'completed' ? `<span style="color:gray; font-size:0.9em;">Completed</span>` : ''}
+            ${status === 'cancelled' ? `<span style="color:red; font-size:0.9em;">Cancelled</span>` : ''}
+          </div>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        console.error('Error loading appointments:', error);
+        document.getElementById('appointmentsList').innerHTML = '<p class="empty-state">Network error. Please check your connection.</p>';
+      }
+    }
+
+    async function approveAppointment(appointmentId) {
+      if (!confirm('Are you sure you want to approve this appointment?')) return;
+      
+      try {
+        const response = await fetch(`${API}/appointments/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('doctorToken')}`
+            },
+            body: JSON.stringify({ appointmentId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showMessage('Appointment Approved!', 'success');
+            loadAppointments();
+        } else {
+            console.error('Approval failed:', data);
+            showMessage(data.message || 'Failed to approve appointment.', 'error');
+        }
+      } catch (e) {
+        console.error('Error approving appointment:', e);
+        showMessage('Error approving appointment: ' + e.message, 'error');
+      }
+    }
+
+    async function rejectAppointment(appointmentId) {
+      if (!confirm('Are you sure you want to reject this appointment?')) return;
+      
+      try {
+        const response = await fetch(`${API}/appointments/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('doctorToken')}`
+            },
+            body: JSON.stringify({ appointmentId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showMessage('Appointment Rejected', 'success');
+            loadAppointments();
+        } else {
+            console.error('Rejection failed:', data);
+            showMessage(data.message || 'Failed to reject appointment.', 'error');
+        }
+      } catch (e) {
+        console.error('Error rejecting appointment:', e);
+        showMessage('Error rejecting appointment: ' + e.message, 'error');
+      }
+    }
+
+    async function updateStatus(appointmentId, newStatus) {
+      const token = localStorage.getItem('doctorToken');
+      if (!token) return;
+
+      if (!confirm(`Are you sure you want to mark this appointment as ${newStatus}?`)) {
+        return;
+      }
+
+      let url = `${API}/appointments/${appointmentId}`;
+      let method = 'PUT';
+      let body = { status: newStatus };
+
+      if (newStatus === 'completed') {
+          const notes = prompt("Enter consultation notes (optional):");
+          url = `${API}/appointments/complete`;
+          method = 'POST';
+          body = { appointmentId, doctorNotes: notes || '' };
+      }
+
+      try {
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (response.ok && data.success) {
+          showMessage(`Appointment ${newStatus} successfully!`, 'success');
+          await loadAppointments();
+        } else {
+          showMessage(data.message || 'Failed to update appointment.', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating appointment:', error);
+        showMessage('Network error. Please try again.', 'error');
+      }
+    }
+  </script>
+</body>
+</html>

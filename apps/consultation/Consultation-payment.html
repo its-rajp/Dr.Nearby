@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Pay for Consultation</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/forms.css" />
+  <style>
+    .payment-details {
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      border: 1px solid #ddd;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    .detail-label {
+      font-weight: bold;
+      color: #555;
+    }
+    .detail-value {
+      font-weight: 600;
+      color: #333;
+    }
+    .payment-methods {
+      margin-bottom: 2rem;
+    }
+    .payment-method-option {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .payment-method-option:hover {
+      background-color: #f0f8ff;
+      border-color: #3498db;
+    }
+    .payment-method-option input {
+      margin-right: 1rem;
+    }
+    .payment-method-label {
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../profile.html">My Profile</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="form-container" style="max-width: 600px;">
+      <h2>Consultation Payment</h2>
+      
+      <div id="loading" style="text-align: center;">Loading details...</div>
+      
+      <div id="content" style="display: none;">
+        <div class="payment-details">
+          <div class="detail-row">
+            <span class="detail-label">Doctor:</span>
+            <span class="detail-value" id="doctorName">N/A</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Specialty:</span>
+            <span class="detail-value" id="specialty">N/A</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date:</span>
+            <span class="detail-value" id="date">N/A</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Time:</span>
+            <span class="detail-value" id="time">N/A</span>
+          </div>
+          <div class="detail-row" style="margin-top: 1rem; border-top: 1px solid #ddd; padding-top: 1rem;">
+            <span class="detail-label">Fee:</span>
+            <span class="detail-value" style="color: #2ecc71;">₹<span id="fee">0</span></span>
+          </div>
+        </div>
+
+        <h3>Select Payment Method</h3>
+        <form id="paymentForm">
+          <div class="payment-methods">
+            <label class="payment-method-option">
+              <input type="radio" name="paymentMethod" value="Credit/Debit Card" required>
+              <span class="payment-method-label">Credit/Debit Card</span>
+            </label>
+            <label class="payment-method-option">
+              <input type="radio" name="paymentMethod" value="UPI">
+              <span class="payment-method-label">UPI</span>
+            </label>
+            <label class="payment-method-option">
+              <input type="radio" name="paymentMethod" value="Net Banking">
+              <span class="payment-method-label">Net Banking</span>
+            </label>
+            <label class="payment-method-option">
+              <input type="radio" name="paymentMethod" value="Wallet">
+              <span class="payment-method-label">Wallet</span>
+            </label>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%;">Pay Now</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const consultationId = urlParams.get('consultationId');
+      
+      if (!consultationId) {
+        alert('Invalid consultation ID');
+        window.location.href = '../index.html';
+        return;
+      }
+
+      const token = localStorage.getItem('token') || localStorage.getItem('doctorToken');
+      if (!token) {
+        window.location.href = '../user-login.html';
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/consultations/${consultationId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+
+        if (data.success && data.consultation) {
+          const c = data.consultation;
+          const doctor = c.doctorId || {};
+          
+          document.getElementById('doctorName').textContent = doctor.name || 'Not specified';
+          document.getElementById('specialty').textContent = doctor.specialization || 'N/A';
+          document.getElementById('date').textContent = new Date(c.date).toLocaleDateString();
+          document.getElementById('time').textContent = c.timeSlot || 'N/A';
+          // Assuming a standard fee or fetching from doctor profile. For now hardcoded or random like user asked for "Fee: ₹0" initially but usually it's real.
+          // User asked for "Fee: ₹0" in the example format. I will use 500 as a placeholder or 0 if specified.
+          // User said "Fee: ₹0" in the example. I will stick to 0 for now unless I find fee data.
+          // Actually, let's put 500 as a realistic default, or 0 if they want it free. 
+          // The prompt said: "Fee: ₹0" in the requested format example. I'll use 500 to be realistic but maybe 0 is what they want?
+          // I'll set it to 500 for better UX, or keep it 0 if the user explicitly wants that format. 
+          // The user said "consultation payment page format be in this way ... Fee: ₹0". 
+          document.getElementById('fee').textContent = '0'; 
+          
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('content').style.display = 'block';
+        } else {
+          throw new Error(data.message || 'Failed to load details');
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById('loading').textContent = 'Error loading details. Please try again.';
+      }
+
+      document.getElementById('paymentForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        const amount = document.getElementById('fee').textContent;
+        
+        // Redirect to confirmation with details
+        const params = new URLSearchParams();
+        params.append('consultationId', consultationId);
+        params.append('amount', amount);
+        params.append('method', selectedMethod);
+        params.append('doctor', document.getElementById('doctorName').textContent);
+        params.append('date', document.getElementById('date').textContent);
+        params.append('time', document.getElementById('time').textContent);
+        
+        // Simulate processing delay
+        const btn = e.target.querySelector('button');
+        btn.textContent = 'Processing...';
+        btn.disabled = true;
+        
+        setTimeout(() => {
+          window.location.href = `payment-confirmation-consultation.html?${params.toString()}`;
+        }, 1500);
+      });
+    });
+  </script>
+</body>
+</html>

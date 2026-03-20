@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Notifications</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .notifications-list {
+      margin: 1.5rem 0;
+    }
+    .notification-item {
+      background: white;
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+      border-radius: 6px;
+      border-left: 4px solid #007bff;
+    }
+    .notification-item.unread {
+      border-left-color: #dc3545;
+      font-weight: bold;
+    }
+    .notification-actions {
+      margin-top: 0.5rem;
+      text-align: right;
+    }
+    .notification-actions button {
+      background: none;
+      border: none;
+      color: #007bff;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="notification.html">Notifications</a>
+      <a href="profile.html">My Profile</a>
+      <a href="#" onclick="logoutUser(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Notifications</h2>
+    <div id="message" style="display:none;"></div>
+
+    <div class="notifications-list">
+      <div id="notificationsContainer">
+        <p>Loading notifications...</p>
+      </div>
+    </div>
+
+    <button onclick="markAllAsRead()" style="margin-top:1rem;">Mark All as Read</button>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/notifications.js"></script>
+</body>
+</html>

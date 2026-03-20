@@ -1,0 +1,21 @@
+{
+  "name": "dr-nearby-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Main entry point to run all Dr.Nearby services.",
+  "type": "module",
+  "scripts": {
+    "start": "concurrently -k -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgGreen.bold\" \"npm:start-backend\" \"npm:start-frontend\"",
+    "dev": "npm start",
+    "start-backend": "concurrently -n \"GATEWAY,PATIENT,DOCTOR,ADMIN,CONSULT\" -c \"cyan,green,magenta,yellow,blue\" \"node apps/api-Gateway/server.js\" \"node apps/Patient-service/server.js\" \"node apps/Doctor-service/server.js\" \"node apps/admin-service/server.js\" \"node apps/Consultation-service/server.js\"",
+    "start-frontend": "http-server . -p 8000 -c-1 --cors -o apps/get_started.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "http-server": "^14.1.1"
+  }
+}

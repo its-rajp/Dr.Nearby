@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/style.css" />
+  <title>Dr.Nearby - Get Started</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+      gap: 20px;
+    }
+    header {
+      display: none; /* Hide header from base style on this specific page */
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 320px;
+    }
+    .card h1 {
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 8px;
+      width: 100%;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    footer {
+      position: fixed;
+      bottom: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Dr.Nearby</h1>
+    <p>Select your role to continue:</p>
+    <button data-url="user-login.html">Enter as User</button>
+    <button data-url="DOCTOR INTERFACE/doctor-login.html">Enter as Doctor</button>
+    <button data-url="Admin_panel/admin-login.html">Enter as Administrator</button>
+  </div>
+  <footer>&copy; 2025 Dr.Nearby. All rights reserved.</footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.card button').forEach(button => {
+        button.addEventListener('click', () => {
+          const url = button.getAttribute('data-url');
+          if (url) {
+            window.location.href = url;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

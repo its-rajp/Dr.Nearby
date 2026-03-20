@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. [Doctor's Name] - Dr.Nearby</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .doctor-profile {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .doctor-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .doctor-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .detail-section {
+            margin-bottom: 1rem;
+        }
+
+        .detail-section h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 0.25rem;
+        }
+
+        .availability-slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .slot {
+            background-color: #e0e0e0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .rating {
+            color: #ffc107;
+        }
+
+        .fees {
+            font-weight: bold;
+        }
+
+        .book-button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Dr.Nearby</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="Search Doctor Page.html">Find a Doctor</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="doctor-profile">
+            <div class="doctor-header">
+                <h1>Dr. Rajkumar Godhake</h1>
+                <p>Gynecology Specialist</p>
+            </div>
+
+            <div class="doctor-details">
+                <div class="detail-section">
+                    <h3>Qualifications</h3>
+                    <p>MBBS, MD (Gynecology), Fellowship in Interventional Gynecology</p>
+                </div>Gynecology
+
+                <div class="detail-section">
+                    <h3>Experience</h3>
+                    <p>15+ years of experience as a consultant Gynecologist. Specializes in interventional Gynecology and Pregnancy guidence management.</p>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Ratings</h3>
+                    <p>
+                        <span class="rating">★★★★☆</span> (4.5/5)
+                        <br>
+                        Based on 120 patient reviews
+                    </p>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Available Slots</h3>
+                    <div class="availability-slots">
+                        <span class="slot">Mon 03:00 PM</span>
+                        <span class="slot">Tue 04:00 PM</span>
+                        <span class="slot">Wed 02:00 PM</span>
+                        <span class="slot">Thu 02:00 PM</span>
+                        <span class="slot">Fri 07:00 PM</span>
+                        <span class="slot">Sat 07:00 PM</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Consultation Fees</h3>
+                    <p class="fees">$170</p>
+                </div>
+
+            </div>
+
+            <a href="book-appointment.html?doctor=Dr.%20Rajkumar%20Godhake" class="book-button">Book Appointment</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Dr.Nearby</p>
+    </footer>
+</body>
+
+</html>

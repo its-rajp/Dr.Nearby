@@ -1,0 +1,130 @@
+/* Modern Doctor Profile Styles */
+
+.doctor-profile-container {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+}
+
+.doctor-info {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.doctor-info img {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1.5rem;
+  border: 4px solid white;
+  box-shadow: var(--shadow-lg);
+}
+
+.doctor-info h2 {
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.specialization {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(67, 24, 255, 0.1);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+
+.doctor-info p {
+  color: var(--text-secondary);
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.doctor-info button {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.doctor-details {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  box-shadow: var(--shadow-md);
+}
+
+.doctor-details h3 {
+  margin: 2rem 0 1rem;
+  color: var(--text-main);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.doctor-details h3::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 24px;
+  background: var(--secondary);
+  border-radius: 4px;
+}
+
+.doctor-details ul {
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.doctor-details ul li {
+  background: var(--bg-body);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-weight: 500;
+  border-left: 4px solid var(--primary);
+}
+
+.reviews {
+  background: var(--bg-body);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  margin-top: 1rem;
+}
+
+.review-item {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.review-item:last-child { border-bottom: none; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .doctor-profile-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .doctor-info {
+    position: static;
+  }
+}

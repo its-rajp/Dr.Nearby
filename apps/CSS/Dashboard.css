@@ -1,0 +1,91 @@
+/* Modern Dashboard Styles */
+
+#dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 1rem 0;
+}
+
+.dashboard-card {
+  background: var(--bg-surface);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Decorate background shapes for effect */
+.dashboard-card::after {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, rgba(67, 24, 255, 0.1), rgba(67, 24, 255, 0));
+  border-radius: 50%;
+  z-index: -1;
+  transition: var(--transition);
+}
+
+.dashboard-card:hover::after {
+  transform: scale(1.5);
+}
+
+.dashboard-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.dashboard-card h2 {
+  color: var(--text-main);
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-card p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.dashboard-card a {
+  display: inline-block;
+  background: var(--bg-body);
+  color: var(--primary);
+  text-decoration: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  transition: var(--transition);
+  align-self: flex-start;
+}
+
+.dashboard-card a:hover {
+  background: var(--primary);
+  color: white;
+  box-shadow: var(--shadow-primary);
+}
+
+/* Specific Card Variants (Optional) */
+.dashboard-card.highlight {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+}
+
+.dashboard-card.highlight h2, 
+.dashboard-card.highlight p {
+  color: white;
+}
+
+.dashboard-card.highlight a {
+  background: white;
+  color: var(--primary);
+}

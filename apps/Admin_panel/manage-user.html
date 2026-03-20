@@ -1,0 +1,80 @@
+<!-- dr-nearby/admin/manage-user.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Manage Users</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby Admin</h1>
+    <nav>
+      <a href="admin-dashboard.html">Dashboard</a>
+      <a href="manage-user.html" class="active">Manage Users</a>
+      <a href="#" onclick="logout(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>User & Doctor Management</h2>
+    <p>View and manage registration details. Note: Passwords are visible.</p>
+
+    <div class="dashboard-section">
+      <h3>Registered Users (Patients)</h3>
+      <button class="add-btn" onclick="openModal('user')">Add User</button>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Login Status</th>
+            <th>Login History</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Registered Doctors</h3>
+      <button class="add-btn" onclick="openModal('doctor')">Add Doctor</button>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Login Status</th>
+            <th>Login History</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="doctorsTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h3 id="modalTitle"></h3>
+        <form id="modalForm"></form>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/admin.js"></script>
+</body>
+</html>

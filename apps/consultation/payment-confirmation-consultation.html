@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Consultation Confirmed</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .confirmation-container {
+      max-width: 500px;
+      margin: 4rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .success-icon {
+      font-size: 3rem;
+      color: #2ecc71;
+      margin-bottom: 1rem;
+    }
+    .receipt-title {
+      color: #2c3e50;
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+    }
+    .receipt-details {
+      text-align: left;
+      margin-bottom: 2rem;
+      border: 1px solid #eee;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.8rem;
+      font-size: 1rem;
+    }
+    .receipt-label {
+      color: #7f8c8d;
+      font-weight: 500;
+    }
+    .receipt-value {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    .btn-home {
+      background-color: #3498db;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      display: inline-block;
+    }
+    .btn-home:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="confirmation-container">
+    <div class="success-icon">✅</div>
+    <h2 class="receipt-title">Consultation Payment Successful</h2>
+    
+    <div class="receipt-details">
+      <div class="receipt-row">
+        <span class="receipt-label">Transaction ID:</span>
+        <span class="receipt-value" id="txnId">CONS...</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Doctor:</span>
+        <span class="receipt-value" id="doctor">N/A</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Date:</span>
+        <span class="receipt-value" id="date">N/A</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Time:</span>
+        <span class="receipt-value" id="time">N/A</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Amount Paid:</span>
+        <span class="receipt-value" style="color: #2ecc71;">₹<span id="amount">0</span></span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Payment Method:</span>
+        <span class="receipt-value" id="method">N/A</span>
+      </div>
+    </div>
+
+    <a href="../index.html" class="btn-home">Go to Home</a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // Generate random Transaction ID
+      const txnId = 'CONS' + Math.floor(100000 + Math.random() * 900000);
+      document.getElementById('txnId').textContent = txnId;
+      
+      // Populate details from URL params
+      document.getElementById('doctor').textContent = urlParams.get('doctor') || 'Not specified';
+      document.getElementById('date').textContent = urlParams.get('date') || 'Not scheduled';
+      document.getElementById('time').textContent = urlParams.get('time') || 'Not scheduled';
+      document.getElementById('amount').textContent = urlParams.get('amount') || '0';
+      document.getElementById('method').textContent = urlParams.get('method') || 'Credit/Debit Card';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Lab Test Payment</title>
+  <link rel="stylesheet" href="../CSS/Style.css" />
+  <link rel="stylesheet" href="../CSS/forms.css" />
+  <style>
+    .payment-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .order-summary {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 6px;
+      margin-bottom: 2rem;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      color: #555;
+    }
+    .summary-total {
+      border-top: 1px solid #ddd;
+      padding-top: 1rem;
+      margin-top: 1rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #333;
+    }
+    .payment-methods {
+      margin-bottom: 2rem;
+    }
+    .method-card {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .method-card:hover, .method-card.selected {
+      border-color: #007bff;
+      background: #f0f7ff;
+    }
+    .method-card input {
+      margin-right: 1rem;
+    }
+    .btn-pay {
+      width: 100%;
+      padding: 1rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-pay:hover {
+      background: #218838;
+    }
+    .secure-badge {
+      text-align: center;
+      margin-top: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .details-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    .details-section p {
+        margin: 0.2rem 0;
+        color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby - Secure Payment</h1>
+  </header>
+
+  <main>
+    <div class="payment-container">
+      <h2>Complete Lab Test Booking</h2>
+      <div id="message"></div>
+      
+      <div class="order-summary" id="orderSummary">
+        <h3>Booking Summary</h3>
+        <div class="details-section">
+            <p><strong>Test:</strong> <span id="testNameDisplay">Loading...</span></p>
+            <p><strong>Date:</strong> <span id="dateDisplay">-</span></p>
+            <p><strong>Address:</strong> <span id="addressDisplay">-</span></p>
+        </div>
+        <div class="summary-row">
+            <span>Test Fee</span>
+            <span id="itemsTotal">₹0.00</span>
+        </div>
+        <div class="summary-row">
+            <span>Home Collection Fee</span>
+            <span>₹0.00</span>
+        </div>
+        <div class="summary-total summary-row">
+            <span>Total to Pay</span>
+            <span>₹<span id="totalAmount">0.00</span></span>
+        </div>
+      </div>
+
+      <form id="labPaymentForm">
+        <div class="payment-methods">
+            <h3>Select Payment Method</h3>
+            
+            <div class="method-card" onclick="selectMethod('upi')">
+                <input type="radio" name="paymentMethod" id="upi" value="upi" checked>
+                <label for="upi">
+                    <strong>UPI</strong><br>
+                    <small>Google Pay, PhonePe, Paytm</small>
+                </label>
+            </div>
+
+            <div class="method-card" onclick="selectMethod('card')">
+                <input type="radio" name="paymentMethod" id="card" value="card">
+                <label for="card">
+                    <strong>Credit / Debit Card</strong><br>
+                    <small>Visa, Mastercard, RuPay</small>
+                </label>
+            </div>
+
+            <div class="method-card" onclick="selectMethod('cod')">
+                <input type="radio" name="paymentMethod" id="cod" value="cod">
+                <label for="cod">
+                    <strong>Pay at Collection</strong><br>
+                    <small>Cash or UPI upon sample collection</small>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-pay" id="payBtn">Pay Now</button>
+      </form>
+      
+      <div class="secure-badge">
+        🔒 100% Secure Payment via Dr.Nearby Gateway
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/payment.js"></script>
+  <script>
+    // UI Helper for selection
+    function selectMethod(value) {
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
+            input.checked = (input.value === value);
+        });
+        document.querySelectorAll('.method-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        const selected = document.querySelector(`input[value="${value}"]`);
+        if(selected) selected.closest('.method-card').classList.add('selected');
+        
+        // Update button text
+        const total = document.getElementById('totalAmount').textContent;
+        const btn = document.getElementById('payBtn');
+        if (value === 'cod') {
+            btn.textContent = `Confirm Booking`;
+        } else {
+            btn.textContent = `Pay ₹${total}`;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Ensure user is logged in
+        if (typeof protectPage === 'function') {
+            await protectPage();
+        }
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const testId = urlParams.get('testId');
+        const testName = urlParams.get('testName');
+        const price = parseFloat(urlParams.get('price') || 0);
+        const date = urlParams.get('date');
+        const address = urlParams.get('address');
+        
+        if (!testId || !testName) {
+            alert('Invalid Booking Details');
+            window.location.href = '../Medicine_&_Lab_delivering_now/lab-test.html';
+            return;
+        }
+
+        // Fill details
+        document.getElementById('testNameDisplay').textContent = testName;
+        document.getElementById('dateDisplay').textContent = new Date(date).toLocaleDateString();
+        document.getElementById('addressDisplay').textContent = address;
+        
+        document.getElementById('itemsTotal').textContent = '₹' + price.toFixed(2);
+        document.getElementById('totalAmount').textContent = price.toFixed(2);
+        document.getElementById('payBtn').textContent = `Pay ₹${price.toFixed(2)}`;
+
+        document.getElementById('labPaymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = price;
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const upiId = (method === 'upi') ? 'user@upi' : undefined; // Mock UPI
+
+            // Disable button
+            const btn = document.getElementById('payBtn');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            
+            // Note: processPayment in payment.js handles the redirection if type is lab-test
+            // But we need to pass all booking details in the object as 'paymentData'
+            // The backend expects: { userId, labTestId, testName, patientName, age, gender, date, time, address, amount, paymentMethod }
+            // Some fields like patientName/age/gender we can default from user profile or params if we had them.
+            // For now, defaulting.
+            
+            const success = await processPayment({
+                type: 'lab-test',
+                userId: user.id || user._id,
+                labTestId: testId,
+                testName,
+                patientName: user.name || user.username || 'Patient',
+                age: user.age || 0,
+                gender: user.gender || 'Not specified',
+                date,
+                time: '09:00 AM', // Default
+                address,
+                amount,
+                paymentMethod: method,
+                upiId
+            });
+            
+            if (!success) {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+    });
+  </script>
+</body>
+</html>

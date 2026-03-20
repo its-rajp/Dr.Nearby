@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Prescriptions - Dr.Nearby</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/forms.css" />
+  <style>
+    .prescriptions-container {
+      max-width: 800px;
+      margin: 2rem auto;
+    }
+    .prescription-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .prescription-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .doctor-info {
+      color: #007bff;
+      font-weight: bold;
+    }
+    .date-info {
+      color: #666;
+    }
+    .diagnosis-section {
+      margin-bottom: 1rem;
+    }
+    .medicine-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+    .medicine-table th, .medicine-table td {
+      border: 1px solid #eee;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    .medicine-table th {
+      background: #f8f9fa;
+    }
+    .instructions-box {
+        background: #fff3cd;
+        padding: 0.8rem;
+        border-radius: 4px;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="search_doctor.html">Find Doctor</a>
+      <a href="health-Record.html">Health Records</a>
+      <a href="my-prescriptions.html">Prescriptions</a>
+      <a href="profile.html">My Profile</a>
+      <a href="#" onclick="logoutUser(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="prescriptions-container">
+      <h2>My Prescriptions</h2>
+      <div id="message"></div>
+      
+      <div id="prescriptionsList">
+        <p>Loading prescriptions...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Ensure auth
+        if (typeof protectPage === 'function') {
+            await protectPage();
+        }
+        
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const container = document.getElementById('prescriptionsList');
+
+        try {
+            // Use Consultation Service route via Gateway
+            // Note: Controller expects 'patientId'
+            const response = await fetchWithAuth(`${API_BASE_URL}/prescriptions?patientId=${user.id || user._id}`);
+            const data = await response.json();
+            
+            if (data.success && data.prescriptions) {
+                if (data.prescriptions.length === 0) {
+                    container.innerHTML = '<p>No prescriptions found.</p>';
+                } else {
+                    container.innerHTML = data.prescriptions.map(p => `
+                        <div class="prescription-card">
+                            <div class="prescription-header">
+                                <span class="doctor-info">Dr. ${p.doctorId?.name || 'Unknown'} (${p.doctorId?.specialization || 'General'})</span>
+                                <span class="date-info">${new Date(p.date).toLocaleDateString()}</span>
+                            </div>
+                            
+                            <div class="diagnosis-section">
+                                <strong>Diagnosis:</strong> ${p.diagnosis}
+                            </div>
+                            
+                            <table class="medicine-table">
+                                <thead>
+                                    <tr>
+                                        <th>Medicine</th>
+                                        <th>Dosage</th>
+                                        <th>Frequency</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${p.medicines.map(m => `
+                                        <tr>
+                                            <td>${m.name}</td>
+                                            <td>${m.dosage}</td>
+                                            <td>${m.frequency}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                            
+                            ${p.instructions ? `
+                                <div class="instructions-box">
+                                    <strong>Instructions:</strong> ${p.instructions}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('');
+                }
+            } else {
+                container.innerHTML = '<p>Failed to load prescriptions.</p>';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            container.innerHTML = '<p>Error loading prescriptions.</p>';
+        }
+    });
+  </script>
+</body>
+</html>

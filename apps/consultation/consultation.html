@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Start Consultation</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/forms.css" />
+  <style>
+    /* Payment Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 2rem;
+      border: 1px solid #888;
+      width: 400px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    .payment-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .payment-btn {
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    .payment-btn:hover {
+      background: #f0f7ff;
+      border-color: #007bff;
+    }
+    .payment-btn.upi { color: #5c2d91; }
+    .payment-btn.card { color: #007bff; }
+    .payment-btn.netbanking { color: #ff5722; }
+    
+    .loading-spinner {
+      display: none;
+      margin: 1rem auto;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #007bff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .success-icon {
+      display: none;
+      color: #28a745;
+      font-size: 3rem;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="paymentModal" class="modal">
+    <div class="modal-content">
+      <h2 style="color: #007bff;">Secure Payment Gateway</h2>
+      <p>Consultation Fee: <strong style="font-size: 1.5rem;">₹500</strong></p>
+      <hr>
+      <div id="paymentOptions">
+        <p>Choose your payment method:</p>
+        <div class="payment-methods">
+          <button class="payment-btn upi" onclick="processPayment('UPI')">
+            <span>📱</span> Google Pay / PhonePe / BHIM
+          </button>
+          <button class="payment-btn card" onclick="processPayment('Card')">
+            <span>💳</span> Credit / Debit Card
+          </button>
+          <button class="payment-btn netbanking" onclick="processPayment('NetBanking')">
+            <span>🏦</span> Net Banking
+          </button>
+        </div>
+        <button onclick="closePaymentModal()" style="background: none; border: none; color: #666; cursor: pointer;">Cancel Payment</button>
+      </div>
+      
+      <div id="paymentProcessing" style="display: none;">
+        <div class="loading-spinner" style="display: block;"></div>
+        <p>Verifying with bank...</p>
+        <p style="font-size: 0.8rem; color: #666;">Please do not refresh or close the page.</p>
+      </div>
+
+      <div id="paymentSuccess" style="display: none;">
+        <div class="success-icon" style="display: block;">✔</div>
+        <h3 style="color: #28a745;">Payment Successful!</h3>
+        <p>Transaction ID: DRNB-${Math.floor(Math.random()*1000000)}</p>
+        <p>Redirecting to doctor...</p>
+      </div>
+    </div>
+  </div>
+  <header>
+    <h1>Dr.Nearby - Consultation</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../search-doctor.html">Find Doctor</a>
+      <a href="../profile.html">My Profile</a>
+      <a href="#" onclick="logoutUser(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="form-container">
+      <h2>Notifications</h2>
+      <div id="notificationsList" class="notifications-list">
+        <p>No new notifications.</p>
+      </div>
+    </section>
+
+    <section class="form-container">
+      <h2>Start Online Consultation</h2>
+      <div id="message"></div>
+      <form id="consultationForm">
+        <div class="form-group">
+          <label for="doctor">Select Doctor *</label>
+          <select id="doctor" required>
+            <option value="">Choose a doctor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="date">Preferred Date *</label>
+          <input type="date" id="date" required />
+        </div>
+        <div class="form-group">
+          <label for="timeSlot">Time Slot *</label>
+          <select id="timeSlot" required>
+            <option value="">Select time</option>
+            <option value="09:00-09:30">9:00 AM - 9:30 AM</option>
+            <option value="09:30-10:00">9:30 AM - 10:00 AM</option>
+            <option value="10:00-10:30">10:00 AM - 10:30 AM</option>
+            <option value="10:30-11:00">10:30 AM - 11:00 AM</option>
+            <option value="11:00-11:30">11:00 AM - 11:30 AM</option>
+            <option value="11:30-12:00">11:30 AM - 12:00 PM</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="symptoms">Brief Symptoms/Diagnosis*</label>
+          <textarea id="symptoms" rows="4" required placeholder="Describe your symptoms..."></textarea>
+        </div>
+        <button type="submit">Request Consultation</button>
+      </form>
+    </section>
+
+    <section class="form-container" style="margin-top: 2rem;">
+      <h2>My Consultations</h2>
+      <div id="consultationsList">Loading...</div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/consultation.js"></script>
+</body>
+</html>

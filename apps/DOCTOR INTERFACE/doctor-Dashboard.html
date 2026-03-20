@@ -1,0 +1,215 @@
+<!-- dr-nearby/doctor-interface/doctor-dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dr.Nearby - Doctor Dashboard</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/doctor-interface.css" />
+</head>
+<body>
+  <header>
+    <h1>Dr.Nearby - Doctor Portal</h1>
+    <nav>
+      <a href="doctor-Dashboard.html">Dashboard</a>
+      <a href="doctor-appointments.html">Appointments</a>
+      <a href="doctor-patients.html">Patients</a>
+      <a href="doctor-communication.html">Consultations</a>
+      <a href="doctor-prescriptions.html">Prescriptions</a>
+      <a href="doctor-notifications.html">Notifications</a>
+      <a href="doctor-profile-edit.html">Profile</a>
+      <a href="#" onclick="doctorLogout(); return false;">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Welcome, Dr. <span id="doctorName">—</span></h2>
+
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <h3>Today’s Appointments</h3>
+        <p id="todayAppointments">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Patients</h3>
+        <p id="totalPatients">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Pending Consultations</h3>
+        <p id="pendingConsultations">0</p>
+      </div>
+    </div>
+
+    <div class="recent-activity">
+      <h3>Recent Appointments</h3>
+      <table>
+        <thead>
+          <tr><th>Patient</th><th>Date</th><th>Time</th><th>Status</th></tr>
+        </thead>
+        <tbody id="recentAppointments">
+          <tr><td colspan="4">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Dr.Nearby</p>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/doctor_portal.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isAuthorized = await protectDoctorPage();
+      if (!isAuthorized) return;
+      await loadDoctorDashboard();
+    });
+
+    async function loadDoctorDashboard() {
+      const token = localStorage.getItem('doctorToken');
+      if (!token) {
+        window.location.href = 'doctor-login.html';
+        return;
+      }
+
+      try {
+        // Load doctor profile from API
+        const profileResponse = await fetch(`${API_BASE_URL}/doctor/profile`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          if (profileData.success && profileData.doctor) {
+            const doctor = profileData.doctor;
+            document.getElementById('doctorName').textContent = doctor.name || 'Doctor';
+            localStorage.setItem('doctorData', JSON.stringify(doctor));
+          }
+        } else {
+          // Fallback to cached data
+          const doctorData = localStorage.getItem('doctorData');
+          if (doctorData) {
+            try {
+              const doctor = JSON.parse(doctorData);
+              document.getElementById('doctorName').textContent = doctor.name || 'Doctor';
+            } catch (e) {
+              console.error('Error parsing doctor data:', e);
+            }
+          }
+        }
+
+        // Fetch appointments for this doctor
+        const doctorData = localStorage.getItem('doctorData');
+        let doctorId = null;
+        if (doctorData) {
+          try {
+            const doctor = JSON.parse(doctorData);
+            doctorId = doctor._id || doctor.id;
+          } catch (e) {
+            console.error('Error parsing doctor data:', e);
+          }
+        }
+
+        if (doctorId) {
+          try {
+            const appointmentsResponse = await fetch(`${API_BASE_URL}/appointments?doctorId=${doctorId}`, {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+
+            if (appointmentsResponse.ok) {
+              const appointmentsData = await appointmentsResponse.json();
+              if (appointmentsData.success && appointmentsData.appointments) {
+                const appointments = appointmentsData.appointments;
+                
+                // Count today's appointments
+                const today = new Date().toISOString().split('T')[0];
+                const todayAppts = appointments.filter(apt => {
+                  const aptDate = new Date(apt.date).toISOString().split('T')[0];
+                  return aptDate === today;
+                });
+                document.getElementById('todayAppointments').textContent = todayAppts.length;
+
+                // Count unique patients
+                const uniquePatients = new Set(appointments.map(apt => apt.patientId?._id || apt.patientId));
+                document.getElementById('totalPatients').textContent = uniquePatients.size;
+
+                // Count pending consultations (appointments with pending status)
+                const pending = appointments.filter(apt => apt.status === 'pending');
+                document.getElementById('pendingConsultations').textContent = pending.length;
+
+                // Show recent appointments (last 5)
+                const recent = appointments.slice(0, 5);
+                if (recent.length > 0) {
+                  document.getElementById('recentAppointments').innerHTML = recent.map(apt => {
+                    const patientName = apt.patientId?.username || apt.patientId?.name || 'Unknown';
+                    const aptDate = new Date(apt.date).toLocaleDateString();
+                    return `
+                      <tr>
+                        <td>${patientName}</td>
+                        <td>${aptDate}</td>
+                        <td>${apt.time || 'N/A'}</td>
+                        <td>${apt.status || 'pending'}</td>
+                      </tr>
+                    `;
+                  }).join('');
+                } else {
+                  document.getElementById('recentAppointments').innerHTML = `
+                    <tr><td colspan="4">No appointments yet</td></tr>
+                  `;
+                }
+              } else {
+                // No appointments
+                document.getElementById('todayAppointments').textContent = '0';
+                document.getElementById('totalPatients').textContent = '0';
+                document.getElementById('pendingConsultations').textContent = '0';
+                document.getElementById('recentAppointments').innerHTML = `
+                  <tr><td colspan="4">No appointments yet</td></tr>
+                `;
+              }
+            }
+          } catch (error) {
+            console.error('Error fetching appointments:', error);
+            // Show placeholder on error
+            document.getElementById('todayAppointments').textContent = '0';
+            document.getElementById('totalPatients').textContent = '0';
+            document.getElementById('pendingConsultations').textContent = '0';
+            document.getElementById('recentAppointments').innerHTML = `
+              <tr><td colspan="4">Error loading appointments</td></tr>
+            `;
+          }
+        } else {
+          // No doctor ID
+          document.getElementById('todayAppointments').textContent = '0';
+          document.getElementById('totalPatients').textContent = '0';
+          document.getElementById('pendingConsultations').textContent = '0';
+          document.getElementById('recentAppointments').innerHTML = `
+            <tr><td colspan="4">No appointments yet</td></tr>
+          `;
+        }
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        // Fallback to cached data
+        const doctorData = localStorage.getItem('doctorData');
+        if (doctorData) {
+          try {
+            const doctor = JSON.parse(doctorData);
+            document.getElementById('doctorName').textContent = doctor.name || 'Doctor';
+          } catch (e) {
+            console.error('Error parsing doctor data:', e);
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
