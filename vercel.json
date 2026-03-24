@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "apps/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://drnearby-api-gateway.herokuapp.com/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/apps/$1"
+    }
+  ]
+}
