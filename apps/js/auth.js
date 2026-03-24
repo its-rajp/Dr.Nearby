@@ -12,7 +12,7 @@ function showMessage(message, type = 'info') {
   }
 }
 
-// --- Authentication State Management ---
+
 
 /**
  * Saves the authentication token and user data to localStorage.
@@ -45,7 +45,7 @@ function getCurrentUser() {
  * Clears authentication data and redirects to the start page.
  */
 function logoutUser() {
-  // Clear all potential tokens to ensure clean logout
+  
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   localStorage.removeItem('adminToken');
@@ -54,16 +54,16 @@ function logoutUser() {
   localStorage.removeItem('doctorData');
   localStorage.removeItem('doctorEmail');
   
-  // Redirect to the logout page
+  
   window.location.href = '/apps/logout.html';
 }
 
-// Make logoutUser globally accessible for onclick handlers
+
 window.logoutUser = logoutUser;
-// Also alias as logout for consistency
+
 window.logout = logoutUser;
 
-// --- Page Protection & Authenticated Fetch ---
+
 
 /**
  * Checks if a user is authenticated. If not, redirects to the login page.
@@ -73,7 +73,7 @@ window.logout = logoutUser;
 async function protectPage() {
   const token = getToken();
   if (!token) {
-    // If there's no token, redirect to the login page.
+    
     window.location.href = 'user-login.html';
     return false
   }
@@ -100,17 +100,17 @@ async function fetchWithAuth(url, options = {}) {
   const response = await fetch(url, { ...options, headers });
 
   if (response.status === 401) {
-    // If the token is invalid or expired, log the user out.
+    
     logoutUser();
   }
 
   return response;
 }
 
-// --- Event Listeners for Login/Registration Forms ---
+
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Attach listener for the login form
+  
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Login response status:', response.status);
         console.log('Login response headers:', response.headers);
         
-        // Check if we got a response at all
+        
         if (!response) {
           showMessage('Cannot connect to server. Please ensure the API Gateway is running on port 5501.', 'error');
           return;
@@ -149,14 +149,14 @@ document.addEventListener('DOMContentLoaded', () => {
           data = JSON.parse(text);
           console.log('Login response data:', { ...data, token: data.token ? '***' : undefined });
         } catch (jsonError) {
-          // If response is not JSON, show a generic error
+          
           console.error('JSON parse error:', jsonError);
           showMessage(`Server error. Status: ${response.status}. Response might not be JSON. Please check if services are running.`, 'error');
           return;
         }
         
         if (!response.ok) {
-          // Handle HTTP error status codes (400, 401, 500, etc.)
+          
           const errorMsg = data?.message || `Login failed. Server returned status ${response.status}.`;
           console.error('Login failed:', errorMsg);
           showMessage(errorMsg, 'error');
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
           saveAuthData(data.token, data.user);
           showMessage('Login successful! Redirecting...', 'success');
           setTimeout(() => {
-            window.location.href = 'index.html'; // Redirect to dashboard
+            window.location.href = 'dashboard.html'; 
           }, 500);
         } else {
           const errorMsg = data?.message || 'Login failed.';
@@ -190,13 +190,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Attach listener for the registration form
+  
   const regForm = document.getElementById('regForm');
   if (regForm) {
     regForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      // Get form elements
+      
       const usernameField = document.getElementById('username');
       const emailField = document.getElementById('email');
       const passwordField = document.getElementById('password');
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const dobField = document.getElementById('dob');
       const genderField = document.getElementById('gender');
       
-      // Validate that all required fields are filled
+      
       if (!usernameField || !emailField || !passwordField || !phoneField || !dobField || !genderField) {
         showMessage('Error: Form fields not found. Please refresh the page.', 'error');
         return;
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gender: genderField.value,
       };
 
-      // Validate form data before submitting
+      
       if (!formData.username || !formData.email || !formData.password || !formData.phone || !formData.dob || !formData.gender) {
         showMessage('Please fill all required fields.', 'error');
         return;
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         console.log('Registration response status:', response.status);
         
-        // Check if we got a response at all
+        
         if (!response) {
           showMessage('Cannot connect to server. Please ensure the API Gateway is running on port 5501.', 'error');
           return;
@@ -255,14 +255,14 @@ document.addEventListener('DOMContentLoaded', () => {
           data = JSON.parse(text);
           console.log('Registration response data:', { ...data, token: data.token ? '***' : undefined });
         } catch (jsonError) {
-          // If response is not JSON, show a generic error
+          
           console.error('JSON parse error:', jsonError);
           showMessage(`Server error. Status: ${response.status}. Response might not be JSON. Please check if services are running.`, 'error');
           return;
         }
         
         if (!response.ok) {
-          // Handle HTTP error status codes (400, 409, 500, etc.)
+          
           const errorMsg = data?.message || `Registration failed. Server returned status ${response.status}.`;
           console.error('Registration failed:', errorMsg);
           showMessage(errorMsg, 'error');
@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
           saveAuthData(data.token, data.user);
           showMessage('Registration successful! Redirecting...', 'success');
           setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'dashboard.html';
           }, 500);
         } else {
           const errorMsg = data?.message || 'Registration failed.';

@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 import { connectDB } from '../Shared/Config/db.js';
 import adminRoutes from './routes/admin.routes.js';
 
-// Determine __dirname for ES Modules
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -25,10 +25,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Use the admin routes
+
 app.use('/admin', adminRoutes);
 
-// Connect to database and start server
+
 connectDB(undefined, mongoose).then((connected) => {
   if (!connected) {
     console.warn('⚠️  Starting Admin Service without MongoDB connection. Some features may not work.');

@@ -4,9 +4,9 @@ import { bookAppointment, approveAppointment, rejectAppointment, completeConsult
 const router = Router();
 router.post('/', bookAppointment); // POST /appointments
 router.post('/bookings', bookAppointment); 
-router.post('/approve', approveAppointment); // Doctor approves
-router.post('/reject', rejectAppointment); // Doctor rejects
-router.post('/complete', completeConsultation); // Post-consultation
+router.post('/approve', approveAppointment); 
+router.post('/reject', rejectAppointment); 
+router.post('/complete', completeConsultation); 
 router.get('/', getAppointments);
 router.get('/doctor/:doctorId', getDoctorAppointments);
 router.get('/patient/:patientId', getPatientAppointments);

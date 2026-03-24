@@ -7,7 +7,7 @@
 export const register = (req, res) => {
   console.log('Patient Service: Registration attempt for:', req.body.email);
   const { username, email } = req.body;
-  // In a real app, you would save the user to the database here
+  
   const mockUser = { id: 'user123', username, email };
   const mockToken = 'mock-jwt-token-for-registration';
   res.status(201).json({ success: true, user: mockUser, token: mockToken });

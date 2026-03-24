@@ -6,7 +6,7 @@ import { protect } from '../authMiddleware.js';
 
 const router = express.Router();
 
-// Helper for email validation
+
 const validateEmail = (email) => {
   return String(email)
     .toLowerCase()
@@ -43,7 +43,7 @@ router.post('/register', async (req, res) => {
       phone,
       dob,
       gender,
-      role: 'patient' // This is correct, but requires 'role' in User Schema
+      role: 'patient' 
     });
 
     // 4. Generate Token

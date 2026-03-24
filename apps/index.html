@@ -3,93 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dr.Nearby - Dashboard</title>
-  <link rel="stylesheet" href="CSS/Style.css" />
-  <link rel="stylesheet" href="CSS/Dashboard.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <title>Dr.Nearby - Get Started</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+      gap: 20px;
+    }
+    header {
+      display: none; 
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 320px;
+    }
+    .card h1 {
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 8px;
+      width: 100%;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    footer {
+      position: fixed;
+      bottom: 20px;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
-  <header>
+  <div class="card">
     <h1>Dr.Nearby</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="search_doctor.html">Find a Doctor</a>
-      <a href="my-prescriptions.html">Prescriptions</a>
-      <a href="profile.html">My Profile</a>
-      <a href="settings.html">Settings</a>
-      <a href="#" onclick="logoutUser(); return false;">Logout</a>
-    </nav>
-  </header>
-
-  <main>
-    <section id="hero">
-      <h2>Welcome to Dr.Nearby</h2>
-      <p>Your one-stop solution for convenient healthcare.</p>
-    </section>
-
-    <section id="dashboard">
-      <div class="dashboard-card">
-        <h2>Find a Doctor</h2>
-        <p>Search for doctors by specialty, location, and availability.</p>
-        <a href="search_doctor.html">Search Now</a>
-      </div>
-      <div class="dashboard-card">
-        <h2>Book Appointments</h2>
-        <p>Schedule appointments online with your preferred doctors.</p>
-        <a href="book-appointment.html">Book Now</a>
-      </div>
-      <div class="dashboard-card">
-        <h2>Consult Online</h2>
-        <p>Connect with doctors remotely via video or chat consultations.</p>
-        <a href="consultation/consultation.html">Start Consultation</a>
-      </div>
-      <div class="dashboard-card">
-        <h2>Order Medicines</h2>
-        <p>Order your prescribed medicines and health products online.</p>
-        <a href=" Medicine_&amp;_Lab_delivering_now/order-medicines.html">Order Now</a>
-      </div>
-      <div class="dashboard-card">
-        <h2>Health Records</h2>
-        <p>Store and access your medical history and records securely.</p>
-        <a href="health-Record.html">View Records</a>
-      </div>
-      <div class="dashboard-card">
-        <h2>My Prescriptions</h2>
-        <p>View prescriptions sent by your doctors.</p>
-        <a href="my-prescriptions.html">View Prescriptions</a>
-      </div>
-      <div class="dashboard-card">
-        <h2>Lab Tests</h2>
-        <p>Book lab tests and view your test results online.</p>
-        <a href=" Medicine_&amp;_Lab_delivering_now/lab-test.html">Book Tests</a>
-      </div>
-    </section>
-
-    <section id="notifications">
-      <h3>Latest Notifications</h3>
-      <ul id="notifications-list">
-        <li>Loading notifications...</li>
-      </ul>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 Dr.Nearby</p>
-  </footer>
-
-  <!-- Scripts -->
-  <script src="js/config.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/notifications.js"></script>
+    <p>Select your role to continue:</p>
+    <button data-url="user-login.html">Enter as User</button>
+    <button data-url="DOCTOR INTERFACE/doctor-login.html">Enter as Doctor</button>
+    <button data-url="Admin_panel/admin-login.html">Enter as Administrator</button>
+  </div>
+  <footer>&copy; 2025 Dr.Nearby. All rights reserved.</footer>
 
   <script>
-    // Protect this page
-    document.addEventListener('DOMContentLoaded', async () => {
-      const isLoggedIn = await protectPage();
-      if (!isLoggedIn) return;
-      // Optional: show username
-      const user = getCurrentUser();
-      const h2 = document.getElementById('hero')?.querySelector('h2');
-      if (h2 && user?.username) h2.textContent += `, ${user.username}`;
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.card button').forEach(button => {
+        button.addEventListener('click', () => {
+          const url = button.getAttribute('data-url');
+          if (url) {
+            window.location.href = url;
+          }
+        });
+      });
     });
   </script>
 </body>

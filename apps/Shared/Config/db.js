@@ -1,5 +1,5 @@
-// Note: mongoose should be imported by the service and passed to this function
-// This avoids module resolution issues when importing from Shared directory
+
+
 export const connectDB = async (uri, mongooseInstance) => {
   if (!mongooseInstance) {
     console.error('❌ mongoose instance is required. Please import mongoose in your service and pass it to connectDB.');
@@ -16,7 +16,7 @@ export const connectDB = async (uri, mongooseInstance) => {
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error.message);
     console.error('⚠️  Please ensure MongoDB is running and the connection string is correct.');
-    console.error('⚠️  Connection string:', dbUri.replace(/\/\/.*@/, '//***:***@')); // Hide credentials
+    console.error('⚠️  Connection string:', dbUri.replace(/\/\/.*@/, '//***:***@')); 
     console.error('⚠️  Service will continue but database operations will fail.');
     return false;
   }

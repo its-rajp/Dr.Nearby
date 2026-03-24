@@ -33,14 +33,14 @@ for (const t of targets) {
   await setPassword(t.email, t.password);
 }
 
-// Update doctor profile details for RAJKUMAR GHODKE
+
 async function updateDoctorProfile() {
   await mongoose.connect(MONGODB_URI);
-  // Try finding by the new email first
+  
   let filter = { email: 'rajkumargodhke13@gmail.com' };
   let doc = await Doctor.findOne(filter);
   
-  // If not found, try the old email (in case it wasn't updated yet)
+  
   if (!doc) {
       filter = { email: 'rajkumargodke@gmai.com' };
   }

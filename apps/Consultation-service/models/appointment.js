@@ -7,8 +7,8 @@ const appointmentSchema = new mongoose.Schema({
   time: { type: String, required: true },
   status: { 
     type: String, 
-    enum: ['pending_approval', 'approved', 'scheduled', 'completed', 'cancelled', 'rejected'], 
-    default: 'pending_approval' 
+    enum: ['pending', 'pending_approval', 'approved', 'confirmed', 'scheduled', 'in_progress', 'completed', 'cancelled', 'rejected'], 
+    default: 'pending' 
   },
   paymentStatus: {
     type: String,
@@ -23,7 +23,7 @@ const appointmentSchema = new mongoose.Schema({
   doctorNotes: { type: String, default: '' }
 }, { timestamps: true });
 
-// Index for faster queries
+
 appointmentSchema.index({ doctorId: 1, date: 1 });
 appointmentSchema.index({ patientId: 1, date: 1 });
 

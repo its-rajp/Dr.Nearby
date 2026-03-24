@@ -14,7 +14,7 @@ export const uploadHealthRecord = async (req, res) => {
       userId: userId,
       type: req.body.type,
       notes: req.body.notes,
-      fileUrl: `/uploads/${req.file.filename}`, // Use the path provided by multer
+      fileUrl: `/uploads/${req.file.filename}`, 
       sharedWith: req.body.sharedWith ? [req.body.sharedWith] : []
     };
 
@@ -34,7 +34,7 @@ export const uploadProfilePhoto = async (req, res) => {
         
         const imageUrl = `/uploads/${req.file.filename}`;
         
-        // Update user profile with image URL
+        
         const User = (await import('../models/user.model.js')).default;
         await User.findByIdAndUpdate(req.user._id, { profileImage: imageUrl });
         
@@ -73,13 +73,13 @@ export const getHealthRecords = async (req, res) => {
   const userId = req.user ? req.user._id : null;
 
   try {
-    // If doctor is requesting, return records shared with them
+    
     if (req.doctor) {
         const records = await HealthRecord.find({ sharedWith: req.doctor._id }).populate('userId', 'name email');
         return res.json({ success: true, records });
     }
 
-    // If patient is requesting, return their own records
+    
     const records = await HealthRecord.find({ userId: userId });
     res.json({ success: true, records });
   } catch (error) {
@@ -128,7 +128,7 @@ export const getOrderById = async (req, res) => {
     if (!order) {
         return res.status(404).json({ success: false, message: 'Order not found' });
     }
-    // Verify user owns this order
+    
     if (order.userId._id.toString() !== req.user._id.toString()) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
@@ -148,13 +148,13 @@ export const processMedicinePayment = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Order not found' });
     }
     
-    // Verify user
+    
     if (order.userId.toString() !== req.user._id.toString()) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
     }
 
-    // Mock payment processing
-    // In real app, verify transaction with Razorpay/Stripe using req.body.paymentId
+    
+    
 
     order.status = 'confirmed';
     order.paymentMethod = method;
@@ -162,14 +162,14 @@ export const processMedicinePayment = async (req, res) => {
     order.deliveryAddress = address;
     order.paymentDate = new Date();
     
-    // Generate mock transaction ID
+    
     order.transactionId = 'TXN' + Math.floor(100000 + Math.random() * 900000);
     
     if (method === 'upi' && upiId) {
         order.upiId = upiId;
     }
     
-    // Set estimated delivery date (48 hours from now)
+    
     const deliveryDate = new Date();
     deliveryDate.setDate(deliveryDate.getDate() + 2);
     order.deliveryDate = deliveryDate;
@@ -185,9 +185,9 @@ export const processMedicinePayment = async (req, res) => {
 
 export const getAllOrders = async (req, res) => {
     try {
-        // Check if user is admin (assuming role is in req.user)
-        // If role check is done in middleware, this can be skipped
-        // But double check is good
+        
+        
+        
         /* 
         if (req.user.role !== 'admin') {
              return res.status(403).json({ success: false, message: 'Access denied' });

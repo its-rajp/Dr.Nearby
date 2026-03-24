@@ -1,10 +1,10 @@
-// Defines the base URL for the API Gateway
+
 const API_BASE_URL = 'http://localhost:5501/api';
-// In production, replace this with your Ngrok or VPS URL
+
 const SIGNALING_SERVER_URL = 'https://unruffled-unstoutly-keena.ngrok-free.dev';
 
-// Free Public TURN Servers (OpenRelay Project)
-// These are free for development use and don't require a card
+
+
 const TURN_SERVER_URL = 'turn:openrelay.metered.ca:443';
 const TURN_USERNAME = 'openrelayproject';
 const TURN_CREDENTIAL = 'openrelayproject';

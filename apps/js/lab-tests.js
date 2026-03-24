@@ -51,7 +51,7 @@ async function handleLabBooking(e) {
     return;
   }
 
-  // Redirect to Payment Page
+  
   const testId = testEl.value;
   const price = testEl.options[testEl.selectedIndex]?.getAttribute('data-price');
   const testName = testEl.options[testEl.selectedIndex]?.text.split(' - ')[0];

@@ -57,7 +57,7 @@
   <header>
     <h1>Dr.Nearby</h1>
     <nav>
-      <a href="../index.html">Home</a>
+      <a href="../dashboard.html">Home</a>
       <a href="../profile.html">My Profile</a>
     </nav>
   </header>
@@ -130,7 +130,7 @@
       
       if (!consultationId) {
         alert('Invalid consultation ID');
-        window.location.href = '../index.html';
+        window.location.href = '../dashboard.html';
         return;
       }
 
@@ -156,13 +156,13 @@
           document.getElementById('specialty').textContent = doctor.specialization || 'N/A';
           document.getElementById('date').textContent = new Date(c.date).toLocaleDateString();
           document.getElementById('time').textContent = c.timeSlot || 'N/A';
-          // Assuming a standard fee or fetching from doctor profile. For now hardcoded or random like user asked for "Fee: ₹0" initially but usually it's real.
-          // User asked for "Fee: ₹0" in the example format. I will use 500 as a placeholder or 0 if specified.
-          // User said "Fee: ₹0" in the example. I will stick to 0 for now unless I find fee data.
-          // Actually, let's put 500 as a realistic default, or 0 if they want it free. 
-          // The prompt said: "Fee: ₹0" in the requested format example. I'll use 500 to be realistic but maybe 0 is what they want?
+          
+          
+          
+          
+          
           // I'll set it to 500 for better UX, or keep it 0 if the user explicitly wants that format. 
-          // The user said "consultation payment page format be in this way ... Fee: ₹0". 
+          
           document.getElementById('fee').textContent = '0'; 
           
           document.getElementById('loading').style.display = 'none';
@@ -180,7 +180,7 @@
         const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
         const amount = document.getElementById('fee').textContent;
         
-        // Redirect to confirmation with details
+        
         const params = new URLSearchParams();
         params.append('consultationId', consultationId);
         params.append('amount', amount);
@@ -189,7 +189,7 @@
         params.append('date', document.getElementById('date').textContent);
         params.append('time', document.getElementById('time').textContent);
         
-        // Simulate processing delay
+        
         const btn = e.target.querySelector('button');
         btn.textContent = 'Processing...';
         btn.disabled = true;

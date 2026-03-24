@@ -1,13 +1,13 @@
 // dr-nearby/js/medicines.js
 let cart = [];
 
-// Fetch available medicines from backend
+
 async function fetchMedicines() {
     try {
         const response = await fetchWithAuth(`${API_BASE_URL}/medicines`);
         const data = await response.json();
         if (response.ok) {
-            renderMedicines(data.medicines || []); // Ensure we handle the response structure
+            renderMedicines(data.medicines || []); 
         } else {
             throw new Error('Failed to load medicines');
         }
@@ -18,7 +18,7 @@ async function fetchMedicines() {
     }
 }
 
-// Render medicine list
+
 function renderMedicines(medicines) {
     const container = document.getElementById('medicinesContainer');
     if (!container) return;
@@ -37,7 +37,7 @@ function renderMedicines(medicines) {
     `).join('');
 }
 
-// Add to cart
+
 function addToCart(id, name, price) {
     const qtyInput = document.getElementById(`qty-${id}`);
     const qty = parseInt(qtyInput.value) || 1;
@@ -51,7 +51,7 @@ function addToCart(id, name, price) {
     showMessage(`${name} added to cart!`, 'success');
 }
 
-// Update cart UI
+
 function updateCartSummary() {
     const count = cart.reduce((sum, item) => sum + item.quantity, 0);
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -64,7 +64,7 @@ function updateCartSummary() {
     if (checkoutBtn) checkoutBtn.disabled = count === 0;
 }
 
-// Checkout function
+
 async function checkout() {
     if (cart.length === 0) return;
 
@@ -82,7 +82,7 @@ async function checkout() {
             showMessage('Order placed successfully! Redirecting...', 'success');
             cart = [];
             updateCartSummary();
-            // Redirect to payment page with order ID
+            
             setTimeout(() => {
                 window.location.href = `../payment/payment-medicine.html?orderId=${data.orderId}`;
             }, 1500);
@@ -95,7 +95,7 @@ async function checkout() {
     }
 }
 
-// Initialize
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchMedicines();
     const checkoutBtn = document.getElementById('checkoutBtn');
@@ -104,6 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Make globally available for inline onclick
+
 window.addToCart = addToCart;
 window.fetchMedicines = fetchMedicines;

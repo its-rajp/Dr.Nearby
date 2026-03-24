@@ -8,7 +8,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import doctorRoutes from './routes/doctor.routes.js';
 
-// Determine __dirname for ES Modules
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -22,32 +22,32 @@ mongoose.connect(MONGODB_URI)
 const app = express();
 const PORT = process.env.DOCTOR_SERVICE_PORT || 5503;
 
-// Ensure uploads directory exists
+
 if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
 
-// Serve uploaded files
+
 app.use('/uploads', express.static('uploads'));
 
 app.use(cors({
   origin: (origin, callback) => {
-    callback(null, true); // Allow any origin for development
+    callback(null, true); 
   },
   credentials: true
 }));
 app.use(express.json());
 
-// Logging middleware
+
 app.use((req, res, next) => {
   console.log(`[Doctor-Service] ${req.method} ${req.originalUrl}`);
   next();
 });
 
-// The gateway strips /api/doctor to /doctor, so we mount at /doctor
+
 app.use('/doctor', doctorRoutes);
 
-// Health check
+
 app.get('/health', (req, res) => {
   res.json({ status: 'UP', service: 'Doctor-Service' });
 });
@@ -58,7 +58,7 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: `Route not found: ${req.method} ${req.originalUrl}` });
 });
 
-// Error handler
+
 app.use((err, req, res, next) => {
   console.error('Doctor Service Error:', err);
   res.status(500).json({ success: false, message: 'Internal server error' });

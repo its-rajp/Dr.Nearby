@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        // Use unified profile endpoint
+        
         const endpoint = `${API}/profile/${id}?role=${role}`;
 
         const token = localStorage.getItem('adminToken') || localStorage.getItem('authToken') || localStorage.getItem('doctorToken');
@@ -28,24 +28,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (response.ok && data.success) {
             const profile = role === 'doctor' ? data.doctor : data.user;
             
-            // If doctor or admin, try to fetch extra data for patients
+            
             let extraData = {};
             if (role === 'patient' && token) {
                 try {
-                    // Fix: Use the correct endpoint that accepts the patient ID in the URL for doctors
-                    // The /medical-history endpoint (without ID) is for the logged-in user
-                    // We need /medical-history/:id (if implemented) or handle it based on role
-                    // But wait, the previous code used `${API}/medical-history/${id}`. Let's check if that exists.
-                    // The Patient Service has: router.get('/medical-history', protect, getMedicalHistory); -> this is for self
-                    // We need a route for doctors/admins to view a patient's history.
-                    // Assuming we fix/add that route. For now, let's try to fetch it.
                     
-                    // Actually, let's update the Patient Service to allow fetching by ID for authorized roles
-                    // Or check if the doctor service or admin service has a proxy for it.
                     
-                    // Let's assume we added/will add GET /patient/medical-history/:userId
                     
-                    // Check if the current user is a doctor viewing a patient
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                     const isDoctor = !!localStorage.getItem('doctorToken');
                     const isAdmin = !!localStorage.getItem('adminToken');
 
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const historyData = await historyRes.json();
                         if (historyData.success) extraData.medicalHistory = historyData.medicalHistory;
 
-                        // Appointments: doctors need to see appointments for this patient
+                        
                         // GET /api/appointments/patient/:id
                          const appointmentsRes = await fetch(`${API}/appointments/patient/${id}`, {
                             headers: { 'Authorization': `Bearer ${token}` }
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderProfile(data, role, extraData = {}) {
     const container = document.getElementById('profile-content');
     
-    // Check if current user is admin
+    
     const isAdmin = !!localStorage.getItem('adminToken');
     
     if (role === 'doctor') {
@@ -102,7 +102,7 @@ function renderDoctorProfile(doctor, container, isAdmin) {
         `${doctor.location.city || ''}, ${doctor.location.state || ''}` : 
         (doctor.address || 'Location not available');
     
-    // Additional fields requested
+    
     const availability = doctor.availability || 'Available for consultation';
     const fees = doctor.consultationFee || doctor.fees || '500';
     const ratings = doctor.ratings || '4.5/5 (Mock)';
@@ -189,17 +189,17 @@ function renderPatientProfile(user, container, isAdmin, extraData) {
     const medicalHistory = extraData.medicalHistory || 'No history available or unauthorized.';
     const appointments = extraData.appointments || [];
 
-    // Profile Image Logic
+    
     let imgSrc = 'https://via.placeholder.com/150?text=User';
     if (user.profileImage) {
-        // If it starts with http, use as is. Otherwise prepend API base (stripped of /api) if needed
+        
         if (user.profileImage.startsWith('http')) {
             imgSrc = user.profileImage;
         } else {
-            // Assuming API_BASE_URL is like http://localhost:5501/api
-            // We want http://localhost:5501/uploads/...
-            // Or if the backend serves it at /uploads, and we use the gateway...
-            // The profile.js logic used: `${API_BASE_URL.replace('/api', '')}${user.profileImage}`
+            
+            
+            
+            
             const baseUrl = API.replace('/api', ''); 
             imgSrc = `${baseUrl}${user.profileImage.startsWith('/') ? '' : '/'}${user.profileImage}`;
         }
@@ -297,7 +297,7 @@ function bookAppointment(doctorId) {
     window.location.href = `book-appointment.html?doctorId=${doctorId}`;
 }
 
-// Admin Actions
+
 async function editProfile(id, role) {
     const newPassword = prompt(`Enter new password for this ${role}:`);
     if (!newPassword) return;
@@ -331,7 +331,7 @@ async function deactivateUser(id, role) {
     if (!confirm(`Are you sure you want to deactivate this ${role}?`)) return;
 
     try {
-        // Admin service endpoint for deactivation
+        
         const endpoint = role === 'doctor' ? `${API}/admin/doctors/${id}` : `${API}/admin/users/${id}`;
         
         const response = await fetch(endpoint, {
@@ -357,6 +357,6 @@ async function deactivateUser(id, role) {
 }
 
 function viewLogs(id) {
-    // In a real system, this would fetch from an audit log service
+    
     alert(`Viewing activity logs for user: ${id}\n\n1. Login: 2026-02-10 10:00 AM\n2. Profile View: 2026-02-10 10:05 AM\n3. Record Update: 2026-02-11 09:30 AM`);
 }

@@ -12,17 +12,17 @@ const userSchema = new mongoose.Schema({
   profileImage: { type: String, default: '' },
   role: { type: String, default: 'patient' },
   lastLogin: { type: Date },
-  visiblePassword: { type: String }, // Stores plain text password for admin view (INSECURE - User Request)
+  visiblePassword: { type: String }, 
   createdAt: { type: Date, default: Date.now }
 });
 
-// Encrypt password before saving
+
 // userSchema.pre('save', async function (next) {
 //   if (!this.isModified('password')) {
 //     return next();
 //   }
 //   
-//   // Store plain text password before hashing
+//   
 //   this.visiblePassword = this.password;
 //
 //   const salt = await bcrypt.genSalt(10);
@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
 //   next();
 // });
 
-// Match user entered password to hashed password in database
+
 userSchema.methods.matchPassword = async function (enteredPassword) {
   // 1. Try plain text comparison first
   if (enteredPassword === this.password) {

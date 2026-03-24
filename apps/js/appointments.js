@@ -1,5 +1,5 @@
 // apps/js/appointments.js
-// Handles appointment booking functionality
+
 
 const API = (typeof API_BASE_URL !== 'undefined' && API_BASE_URL) || (typeof window !== 'undefined' && window.API_BASE_URL) || 'http://localhost:5501/api';
 
@@ -7,15 +7,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const appointmentForm = document.getElementById('appointmentForm');
   if (!appointmentForm) return;
 
-  // Check for pre-selected doctor from URL
+  
   const urlParams = new URLSearchParams(window.location.search);
   const preSelectedDoctorId = urlParams.get('doctorId');
   const preSelectedDoctorName = urlParams.get('doctorName');
 
-  // Load doctors list
+  
   await loadDoctors(preSelectedDoctorId, preSelectedDoctorName);
 
-  // Handle form submission
+  
   appointmentForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     await bookAppointment();
@@ -30,7 +30,7 @@ async function loadDoctors(preSelectedDoctorId = null, preSelectedDoctorName = n
       return;
     }
 
-    // Fetch doctors list from backend
+    
     const response = await fetch(`${API}/doctor/list`, {
       method: 'GET',
       headers: {
@@ -93,7 +93,7 @@ async function bookAppointment() {
     return;
   }
 
-  // Get current user ID from localStorage
+  
   const userData = localStorage.getItem('user');
   let patientId = null;
   if (userData) {
@@ -111,7 +111,7 @@ async function bookAppointment() {
     return;
   }
 
-  // Prepare Booking Data
+  
   const bookingData = {
     patientId,
     doctorId,
@@ -121,10 +121,10 @@ async function bookAppointment() {
     consultationFee: 500
   };
 
-  // Store in LocalStorage for Payment Page
+  
   localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
 
-  // Redirect to Payment Page
+  
   window.location.href = 'payment.html';
 }
 

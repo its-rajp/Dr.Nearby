@@ -18,7 +18,7 @@ const labBookingSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   time: { type: String, required: true },
   homeCollection: { type: Boolean, default: false },
-  address: { type: String }, // Required if homeCollection is true
+  address: { type: String }, 
   amount: { type: Number, required: true },
   status: {
     type: String,

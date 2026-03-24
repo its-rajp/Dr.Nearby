@@ -1,5 +1,5 @@
 // apps/js/admin.js
-// Admin dashboard & login functionality
+
 
 const API = (typeof API_BASE_URL !== 'undefined' && API_BASE_URL) || (typeof window !== 'undefined' && window.API_BASE_URL) || 'http://localhost:5501/api';
 
@@ -69,7 +69,7 @@ async function handleAdminLogin(e) {
     }
 }
 
-// Data loading functions
+
 let usersData = [];
 let doctorsData = [];
 
@@ -223,7 +223,7 @@ async function loadAppointments() {
         if (response.ok) {
             const data = await response.json();
             if (data.success && data.appointments) {
-                // Calculate revenue from settled/paid appointments
+                
                 totalConsultationRevenue = data.appointments.reduce((sum, appt) => {
                     if (appt.paymentStatus === 'settled' || appt.paymentStatus === 'paid') {
                         return sum + (appt.consultationFee || 0);
@@ -254,7 +254,7 @@ async function loadAppointments() {
                 }
 
                 // 2. Populate Second Opinion / Link Assignment Table
-                // Filter for 'approved' appointments which need scheduling/link
+                
                 if (secondOpinionBody) {
                     const approvedAppts = data.appointments.filter(appt => appt.status === 'approved');
                     
@@ -300,7 +300,7 @@ async function loadConsultations() {
         if (response.ok) {
             const data = await response.json();
             if (data.success && data.consultations) {
-                // Filter out completed and cancelled consultations to show only active ones
+                
                 const activeConsultations = data.consultations.filter(c => c.status !== 'completed' && c.status !== 'cancelled');
                 
                 if (activeConsultations.length === 0) {
@@ -459,7 +459,7 @@ async function loadAllHealthRecords() {
     }
 }
 
-// Password Reset Functions
+
 window.promptResetUserPassword = async function(userId) {
     const newPassword = prompt("Enter new password for this user:");
     if (!newPassword) return;
@@ -512,7 +512,7 @@ window.promptResetDoctorPassword = async function(doctorId) {
     }
 };
 
-// Modal functions
+
 function openModal(type) {
     const modal = document.getElementById('modal');
     const title = document.getElementById('modalTitle');
@@ -555,10 +555,11 @@ function openLinkModal(appointmentId) {
     form.innerHTML = `
         <input type="hidden" name="appointmentId" value="${appointmentId}">
         <div class="form-group">
-            <label>Meeting URL</label>
-            <input type="url" name="meetLink" placeholder="https://meet.google.com/..." required style="width:100%; padding:8px;">
+            <label>Meeting URL / Type</label>
+            <input type="text" name="meetLink" value="webrtc" required style="width:100%; padding:8px;">
+            <small>Default: 'webrtc' for secure E2EE call</small>
         </div>
-        <button type="submit">Send Link</button>
+        <button type="submit">Assign Secure Link</button>
     `;
     form.onsubmit = submitMeetingLink;
 }
@@ -575,7 +576,7 @@ async function submitMeetingLink(e) {
     }
     
     try {
-        // Use endpoint that updates appointment and creates consultation
+        
         const response = await fetch(`${API}/consultations/${appointmentId}/link`, {
             method: 'PUT',
             headers: { 
@@ -589,7 +590,7 @@ async function submitMeetingLink(e) {
         if (data.success) {
             alert('Meeting link assigned successfully!');
             closeModal();
-            loadAppointments(); // Refresh lists
+            loadAppointments(); 
             loadConsultations();
         } else {
             alert('Failed: ' + data.message);
@@ -623,7 +624,7 @@ window.viewDoctorDetails = function(index) {
     window.location.href = `../common-profile.html?id=${doc._id || doc.id}&role=doctor`;
 };
 
-// Stubs for viewing consultation/appointment details
+
 window.viewAppointment = function(id) { alert('Viewing Appointment: ' + id); };
 window.viewConsultation = function(id) { alert('Viewing Consultation: ' + id); };
 
@@ -642,7 +643,7 @@ async function deleteDoctor(id) {
     }
 }
 
-// Make global
+
 window.openModal = openModal;
 window.openLinkModal = openLinkModal;
 window.closeModal = closeModal;
@@ -658,7 +659,7 @@ window.loadLabBookings = loadLabBookings;
 window.loadAllHealthRecords = loadAllHealthRecords;
 
 
-// Main Initialization
+
 document.addEventListener('DOMContentLoaded', async () => {
   const loginForm = document.getElementById('adminLoginForm');
   if (loginForm) {
@@ -666,18 +667,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   
-  // If we are on admin dashboard or manage-user page
+  
   const token = localStorage.getItem('adminToken');
   if (!token) {
-    // If we are not on login page, redirect
+    
     if (!window.location.href.includes('admin-login.html')) {
         window.location.href = 'admin-login.html';
     }
     return;
   }
   
-  // Load data if on dashboard or manage page
-  // We use try-catch for each to ensure one failure doesn't stop others
+  
+  
   
   if (document.getElementById('usersTableBody')) {
       try { await loadUsers(); } catch(e) { console.error(e); }

@@ -1,4 +1,4 @@
-/* Modern Dashboard Styles */
+
 
 #dashboard {
   display: grid;
@@ -22,7 +22,7 @@
   z-index: 1;
 }
 
-/* Decorate background shapes for effect */
+
 .dashboard-card::after {
   content: '';
   position: absolute;
@@ -75,7 +75,7 @@
   box-shadow: var(--shadow-primary);
 }
 
-/* Specific Card Variants (Optional) */
+
 .dashboard-card.highlight {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
 }

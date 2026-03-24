@@ -57,8 +57,8 @@ export const login = async (req, res) => {
 };
 
 export const getProfile = async (req, res) => {
-  // In real version: verify JWT from req.headers.authorization
-  const user = await User.findById(req.query.userId); // Simplified for demo
+  
+  const user = await User.findById(req.query.userId); 
   if (!user) return res.status(404).json({ success: false, message: 'User not found' });
   res.json({ success: true, user });
 };

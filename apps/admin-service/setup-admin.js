@@ -16,7 +16,7 @@ async function setupAdmin() {
     
     if (adminExists) {
       console.log('Admin user already exists.');
-      // Update password just in case
+      
       adminExists.password = 'admin123';
       await adminExists.save();
       console.log('Admin password reset to: admin123');

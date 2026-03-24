@@ -62,7 +62,7 @@
   <header>
     <h1>Dr.Nearby</h1>
     <nav>
-      <a href="index.html">Home</a>
+      <a href="dashboard.html">Home</a>
       <a href="search_doctor.html">Find Doctor</a>
       <a href="health-Record.html">Health Records</a>
       <a href="my-prescriptions.html">Prescriptions</a>
@@ -90,7 +90,7 @@
   <script src="js/auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-        // Ensure auth
+        
         if (typeof protectPage === 'function') {
             await protectPage();
         }
@@ -99,8 +99,8 @@
         const container = document.getElementById('prescriptionsList');
 
         try {
-            // Use Consultation Service route via Gateway
-            // Note: Controller expects 'patientId'
+            
+            
             const response = await fetchWithAuth(`${API_BASE_URL}/prescriptions?patientId=${user.id || user._id}`);
             const data = await response.json();
             

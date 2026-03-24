@@ -177,7 +177,7 @@
         const container = document.getElementById('consultationsList');
 
         if (!response.ok) {
-          // If endpoint doesn't exist, show message
+          
           container.innerHTML = '<p class="empty-state">Consultations feature coming soon. This will show video/chat consultations with patients.</p>';
           return;
         }
@@ -227,6 +227,7 @@
     }
 
     async function setupSecureCall(consultationId) {
+      if (!confirm('Start a secure video call for this consultation?')) return;
       const res = await window.setConsultationLink(consultationId, 'webrtc');
       if (res.success) {
         showMessage('Secure Video Call set successfully!', 'success');
@@ -236,86 +237,60 @@
       }
     }
 
-    async function promptMeetingLink(consultationId) {
-      const link = prompt('Enter external meeting link (e.g., Google Meet URL):');
-      if (!link) return;
-
-      const res = await window.setConsultationLink(consultationId, link);
-      if (res.success) {
-        showMessage('Meeting link updated!', 'success');
-        await loadConsultations();
-      } else {
-        showMessage(res.message || 'Failed to update meeting link.', 'error');
-      }
-    }
-
     async function startConsultation(consultationId) {
-      const token = localStorage.getItem('doctorToken');
-      if (!token) return;
-
-      try {
-        const response = await fetch(`${API}/consultations/start`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ consultationId })
-        });
-
-        const data = await response.json().catch(() => ({}));
-        if (response.ok && data.success) {
-          showMessage('Consultation started!', 'success');
-          await loadConsultations();
-        } else {
-          showMessage(data.message || 'Failed to start consultation.', 'error');
+        
+        try {
+            const response = await fetch(`${API}/consultations/${consultationId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('doctorToken')}`
+                },
+                body: JSON.stringify({ status: 'in_progress' })
+            });
+            const data = await response.json();
+            if (data.success) {
+                showMessage('Consultation confirmed!', 'success');
+                await loadConsultations();
+            } else {
+                showMessage(data.message || 'Failed to confirm consultation.', 'error');
+            }
+        } catch (e) {
+            console.error('Error confirming consultation:', e);
+            showMessage('Network error.', 'error');
         }
-      } catch (error) {
-        console.error('Error starting consultation:', error);
-        showMessage('Network error. Please try again.', 'error');
-      }
     }
 
     async function endConsultation(appointmentId, consultationId) {
-      if (!confirm('Are you sure you want to end this consultation?')) {
-        return;
-      }
+        if (!confirm('Are you sure you want to end this consultation?')) return;
+        
+        try {
+            // 1. Complete Appointment
+            const apptRes = await fetch(`${API}/appointments/complete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('doctorToken')}`
+                },
+                body: JSON.stringify({ appointmentId })
+            });
+            
+            // 2. Complete Consultation
+            const consRes = await fetch(`${API}/consultations/${consultationId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('doctorToken')}`
+                },
+                body: JSON.stringify({ status: 'completed' })
+            });
 
-      const token = localStorage.getItem('doctorToken');
-      if (!token) return;
-
-      try {
-        // Use the centralized complete endpoint if appointmentId is available
-        let url = `${API}/consultations/${consultationId}`;
-        let method = 'PUT';
-        let body = { status: 'completed' };
-
-        if (appointmentId) {
-            url = `${API}/appointments/complete`;
-            method = 'POST';
-            body = { appointmentId, doctorNotes: 'Completed from Consultation Page' };
+            showMessage('Consultation ended successfully.', 'success');
+            await loadConsultations();
+        } catch (e) {
+            console.error('Error ending consultation:', e);
+            showMessage('Error ending consultation.', 'error');
         }
-
-        const response = await fetch(url, {
-          method: method,
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(body)
-        });
-
-        const data = await response.json().catch(() => ({}));
-        if (response.ok && data.success) {
-          showMessage('Consultation ended successfully!', 'success');
-          await loadConsultations();
-        } else {
-          showMessage(data.message || 'Failed to end consultation.', 'error');
-        }
-      } catch (error) {
-        console.error('Error ending consultation:', error);
-        showMessage('Network error. Please try again.', 'error');
-      }
     }
   </script>
 </body>

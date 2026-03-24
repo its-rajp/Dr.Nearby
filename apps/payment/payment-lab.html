@@ -178,7 +178,7 @@
         const selected = document.querySelector(`input[value="${value}"]`);
         if(selected) selected.closest('.method-card').classList.add('selected');
         
-        // Update button text
+        
         const total = document.getElementById('totalAmount').textContent;
         const btn = document.getElementById('payBtn');
         if (value === 'cod') {
@@ -189,7 +189,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-        // Ensure user is logged in
+        
         if (typeof protectPage === 'function') {
             await protectPage();
         }
@@ -208,7 +208,7 @@
             return;
         }
 
-        // Fill details
+        
         document.getElementById('testNameDisplay').textContent = testName;
         document.getElementById('dateDisplay').textContent = new Date(date).toLocaleDateString();
         document.getElementById('addressDisplay').textContent = address;
@@ -221,19 +221,19 @@
             e.preventDefault();
             const amount = price;
             const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-            const upiId = (method === 'upi') ? 'user@upi' : undefined; // Mock UPI
+            const upiId = (method === 'upi') ? 'user@upi' : undefined; 
 
-            // Disable button
+            
             const btn = document.getElementById('payBtn');
             const originalText = btn.textContent;
             btn.disabled = true;
             btn.textContent = 'Processing...';
             
-            // Note: processPayment in payment.js handles the redirection if type is lab-test
-            // But we need to pass all booking details in the object as 'paymentData'
-            // The backend expects: { userId, labTestId, testName, patientName, age, gender, date, time, address, amount, paymentMethod }
-            // Some fields like patientName/age/gender we can default from user profile or params if we had them.
-            // For now, defaulting.
+            
+            
+            
+            
+            
             
             const success = await processPayment({
                 type: 'lab-test',
@@ -244,7 +244,7 @@
                 age: user.age || 0,
                 gender: user.gender || 'Not specified',
                 date,
-                time: '09:00 AM', // Default
+                time: '09:00 AM', 
                 address,
                 amount,
                 paymentMethod: method,

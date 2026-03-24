@@ -138,7 +138,7 @@
       }
 
       try {
-        // Get all appointments to extract unique patients
+        
         const response = await fetch(`${API}/appointments?doctorId=${doctorId}`, {
           method: 'GET',
           headers: {
@@ -217,9 +217,9 @@
       `;
     }
 
-    // Modal for Health Records
+    
     function viewHealthRecords(patientId, patientName) {
-        // Create modal if not exists
+        
         let modal = document.getElementById('healthRecordsModal');
         if (!modal) {
             modal = document.createElement('div');

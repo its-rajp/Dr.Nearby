@@ -12,7 +12,7 @@
   <header>
     <h1>Dr.Nearby - Doctor Registration</h1>
     <nav>
-      <a href="../get_started.html">Back to Home</a>
+      <a href="../index.html">Back to Home</a>
       <a href="doctor-login.html">Login</a>
     </nav>
   </header>
@@ -118,19 +118,19 @@
 
   <script src="../js/config.js"></script>
   <script>
-    // Verify API_BASE_URL is loaded
+    
     console.log('API_BASE_URL:', typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'NOT FOUND');
     console.log('window.API_BASE_URL:', window.API_BASE_URL || 'NOT FOUND');
   </script>
   <script src="../js/doctor_portal.js"></script>
   <script>
-    // Wait for scripts to load
+    
     window.addEventListener('load', () => {
       console.log('Page loaded, initializing registration form...');
       console.log('registerDoctor function:', typeof registerDoctor);
       console.log('showMessage function:', typeof showMessage);
       
-      // Small delay to ensure all scripts are ready
+      
       setTimeout(() => {
         initRegistrationForm();
       }, 200);
@@ -140,11 +140,11 @@
       const form = document.getElementById('doctorRegForm');
       if (!form) return;
 
-      // Wait for doctor_portal.js to load
+      
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Validate terms
+        
         if (!document.getElementById('terms').checked) {
           if (typeof showMessage !== 'undefined') {
             showMessage('Please accept the Terms & Conditions.', 'error');
@@ -178,7 +178,7 @@
         
         console.log('Prepared doctor data:', { ...doctorData, password: '***' });
 
-        // Basic validation
+        
         const requiredFields = {
           name: doctorData.name,
           email: doctorData.email,
@@ -210,7 +210,7 @@
           return;
         }
         
-        // Validate experience is a number
+        
         if (isNaN(doctorData.experience) || doctorData.experience < 0) {
           const errorMsg = 'Experience must be a valid number (0 or greater).';
           if (typeof showMessage !== 'undefined') {
@@ -221,7 +221,7 @@
           return;
         }
 
-        // Check if registerDoctor is available
+        
         if (typeof registerDoctor === 'undefined') {
           const msg = typeof showMessage !== 'undefined' ? showMessage : alert;
           msg('Registration function not loaded. Please refresh the page.', 'error');
@@ -229,7 +229,7 @@
           return;
         }
 
-        // Show loading message
+        
         const msgDiv = document.getElementById('message');
         if (msgDiv) {
           msgDiv.textContent = 'Registering...';
@@ -237,7 +237,7 @@
           msgDiv.style.display = 'block';
         }
 
-        // Call registration
+        
         try {
           console.log('Calling registerDoctor with data:', { ...doctorData, password: '***' });
           const result = await registerDoctor(doctorData);

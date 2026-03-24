@@ -93,18 +93,18 @@
       </div>
     </div>
 
-    <a href="../index.html" class="btn-home">Go to Home</a>
+    <a href="../dashboard.html" class="btn-home">Go to Home</a>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
       
-      // Generate random Transaction ID
+      
       const txnId = 'CONS' + Math.floor(100000 + Math.random() * 900000);
       document.getElementById('txnId').textContent = txnId;
       
-      // Populate details from URL params
+      
       document.getElementById('doctor').textContent = urlParams.get('doctor') || 'Not specified';
       document.getElementById('date').textContent = urlParams.get('date') || 'Not scheduled';
       document.getElementById('time').textContent = urlParams.get('time') || 'Not scheduled';

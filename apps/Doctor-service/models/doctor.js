@@ -28,17 +28,17 @@ const doctorSchema = new mongoose.Schema({
   profileImage: { type: String, default: '' },
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date },
-  visiblePassword: { type: String }, // Stores plain text password for admin view (INSECURE - User Request)
+  visiblePassword: { type: String }, 
   consultationFee: { type: Number, default: 500 },
   availability: { type: String, default: 'Mon-Fri: 10:00 AM - 6:00 PM' },
   ratings: { type: String, default: '4.5/5' }
 }, { timestamps: true });
 
-// Hash password before saving
+
 // doctorSchema.pre('save', async function(next) {
 //   if (!this.isModified('password')) return next();
   
-//   // Store plain text password before hashing
+//   
 //   this.visiblePassword = this.password;
 
 //   this.password = await bcrypt.hash(this.password, 10);

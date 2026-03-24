@@ -1,4 +1,4 @@
-/* Modern Form Styles */
+
 
 .form-container {
   max-width: 550px;
@@ -11,7 +11,7 @@
   overflow: hidden;
 }
 
-/* Top accent bar */
+
 .form-container::before {
   content: '';
   position: absolute;
@@ -72,7 +72,7 @@
   margin-top: 0.5rem;
 }
 
-/* Checkbox Style */
+
 .checkbox {
   margin-top: 1rem;
 }
@@ -93,7 +93,7 @@
   cursor: pointer;
 }
 
-/* Buttons are handled in Style.css, but ensuring full width for forms */
+
 button[type="submit"] {
   width: 100%;
   margin-top: 1.5rem;
@@ -103,7 +103,7 @@ button[type="submit"] {
   letter-spacing: 0.5px;
 }
 
-/* File Input */
+
 input[type="file"] {
   padding: 0.6rem;
   background: white;

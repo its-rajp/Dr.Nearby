@@ -12,7 +12,7 @@
   <header>
     <h1>Dr.Nearby - Doctor</h1>
     <nav>
-      <a href="../get_started.html">Back to Home</a>
+      <a href="../index.html">Back to Home</a>
     </nav>
   </header>
 
@@ -43,26 +43,26 @@
 
   <script src="../js/config.js"></script>
   <script>
-    // Verify API_BASE_URL is loaded
+    
     console.log('API_BASE_URL:', typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'NOT FOUND');
     console.log('window.API_BASE_URL:', window.API_BASE_URL || 'NOT FOUND');
   </script>
   <script src="../js/doctor_portal.js"></script>
   <script>
-    // Ensure login form is initialized after scripts load
+    
     window.addEventListener('load', () => {
       console.log('Page loaded, initializing login form...');
       console.log('doctorLogin function:', typeof doctorLogin);
       console.log('initDoctorLoginForm function:', typeof initDoctorLoginForm);
       
-      // Small delay to ensure all scripts are ready
+      
       setTimeout(() => {
         if (typeof initDoctorLoginForm === 'function') {
           initDoctorLoginForm();
           console.log('Login form initialized via initDoctorLoginForm');
         } else {
           console.warn('initDoctorLoginForm not found, using fallback');
-          // Fallback initialization
+          
           const form = document.getElementById('doctorLoginForm');
           if (form && typeof doctorLogin !== 'undefined') {
             form.addEventListener('submit', async (e) => {

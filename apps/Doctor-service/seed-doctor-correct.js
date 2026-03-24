@@ -8,12 +8,12 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load env from root
+
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const connectDB = async () => {
   try {
-    // Use the exact same URI as server.js
+    
     const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/drnearby';
     console.log(`Connecting to: ${uri}`);
     const conn = await mongoose.connect(uri);
@@ -65,7 +65,7 @@ const checkDoctors = async () => {
     
     if (!isMatch) {
         console.log('Updating password to password123...');
-        existingTarget.password = 'password123'; // Will be hashed by pre-save
+        existingTarget.password = 'password123'; 
         await existingTarget.save();
         console.log('Password updated.');
     }

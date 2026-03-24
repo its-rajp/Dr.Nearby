@@ -27,17 +27,17 @@ const checkDoctors = async () => {
         await Doctor.deleteMany({ email: 'doctor@example.com' });
     }
     console.log('Creating a default doctor...');
-    // const hashedPassword = await bcrypt.hash('password123', 10); // Don't hash manually if schema does it!
+    // const hashedPassword = await bcrypt.hash('password123', 10); 
     
-    // Check if schema has pre-save hook. Based on typical setup, it likely does.
-    // To be safe, let's use a plain password. If the schema hashes it, good.
-    // If the schema DOES NOT hash it, we might be storing plain text (bad, but works for login if login compares plain).
+    
+    
+    
     // BUT we saw the schema DOES hash it.
     
     const doctor = await Doctor.create({
       name: 'Dr. John Smith',
       email: 'doctor@example.com',
-      password: 'password123', // Pass plain text, let schema hash it
+      password: 'password123', 
       phone: '1234567890',
       dob: new Date('1980-01-01'),
       gender: 'male',
@@ -61,7 +61,7 @@ const checkDoctors = async () => {
       console.log(`- Name: ${d.name}, Email: ${d.email}, ID: ${d._id}`);
     });
     
-    // Check specific credentials if needed
+    
     // const isMatch = await bcrypt.compare('password123', doctors[0].password);
     // console.log(`Password 'password123' match for ${doctors[0].email}: ${isMatch}`);
   }

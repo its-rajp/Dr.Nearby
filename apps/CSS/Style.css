@@ -1,40 +1,40 @@
-/* Global Styles & Variables */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Colors */
-  --primary: #4318FF; /* Vibrant Purple/Blue */
+  
+  --primary: #4318FF; 
   --primary-light: #6C63FF;
   --primary-dark: #3311CC;
-  --secondary: #05CD99; /* Fresh Teal */
+  --secondary: #05CD99; 
   --secondary-dark: #04A67B;
   --danger: #EE5D50;
   --warning: #FFCE20;
   --success: #05CD99;
   
-  /* Backgrounds */
-  --bg-body: #F4F7FE; /* Light Grayish Blue */
+  
+  --bg-body: #F4F7FE; 
   --bg-surface: #FFFFFF;
   --bg-input: #F9F9FC;
   
-  /* Text */
+  
   --text-main: #2B3674;
   --text-secondary: #A3AED0;
   --text-light: #FFFFFF;
   
-  /* UI Elements */
+  
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-lg: 20px;
   --radius-xl: 30px;
   
-  /* Shadows (Soft/Modern) */
+  
   --shadow-sm: 0 2px 12px 0 rgba(112, 144, 176, 0.08);
   --shadow-md: 0 20px 27px 0 rgba(112, 144, 176, 0.05);
   --shadow-lg: 0 30px 60px -12px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3);
   --shadow-primary: 0 10px 20px -10px rgba(67, 24, 255, 0.6);
   
-  /* Transitions */
+  
   --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
@@ -52,7 +52,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Header / Navigation */
+
 header {
   background: var(--bg-surface);
   color: var(--text-main);
@@ -111,7 +111,7 @@ main {
   min-height: 80vh;
 }
 
-/* Footer */
+
 footer {
   text-align: center;
   padding: 2rem;
@@ -122,7 +122,7 @@ footer {
   border-top: 1px solid rgba(0,0,0,0.05);
 }
 
-/* Buttons (Global) */
+
 .btn, button {
   display: inline-flex;
   align-items: center;
@@ -169,7 +169,7 @@ footer {
   box-shadow: 0 15px 30px -10px rgba(238, 93, 80, 0.7);
 }
 
-/* Messages */
+
 #message {
   padding: 1rem;
   margin: 1rem 0;
@@ -196,7 +196,7 @@ footer {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Headings */
+
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-main);
   margin-bottom: 1rem;
@@ -208,7 +208,7 @@ h2 {
   margin-bottom: 1.5rem;
 }
 
-/* Common Utilities */
+
 .card {
   background: var(--bg-surface);
   border-radius: var(--radius-lg);

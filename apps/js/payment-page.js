@@ -5,16 +5,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookingData = localStorage.getItem('pendingBooking');
     if (!bookingData) {
         alert('No pending booking found.');
-        window.location.href = 'index.html';
+        window.location.href = 'dashboard.html';
         return;
     }
 
     const booking = JSON.parse(bookingData);
     
-    // Update UI with booking details if needed
+    
     // (Ideally we would fetch doctor name again or store it in pendingBooking)
     
-    // Auto-select card
+    
     selectMethod('card');
 });
 
@@ -36,7 +36,7 @@ async function processPayment() {
     const token = localStorage.getItem('token');
 
     try {
-        // Validate IDs
+        
         if (!bookingData.patientId || typeof bookingData.patientId !== 'string' || bookingData.patientId.length < 24) {
             throw new Error(`Invalid Patient ID: ${bookingData.patientId}. Please login again.`);
         }
@@ -44,10 +44,10 @@ async function processPayment() {
              throw new Error(`Invalid Doctor ID: ${bookingData.doctorId}. Please re-select doctor.`);
         }
 
-        // Simulate Gateway Delay
+        
         await new Promise(resolve => setTimeout(resolve, 2000));
 
-        // Create the appointment on backend
+        
         console.log('Sending booking data:', {
             ...bookingData,
             paymentStatus: 'paid',
@@ -62,7 +62,7 @@ async function processPayment() {
             },
             body: JSON.stringify({
                 ...bookingData,
-                paymentStatus: 'paid', // Enforce paid status
+                paymentStatus: 'paid', 
                 consultationFee: 500
             })
         });
@@ -70,19 +70,19 @@ async function processPayment() {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            // Generate Receipt Data
+            
             const receipt = {
                 txnId: 'TXN' + Math.floor(Math.random() * 10000000),
                 amount: 500,
-                doctorName: 'Dr. Nearby Specialist', // We could pass this from previous page
+                doctorName: 'Dr. Nearby Specialist', 
                 date: new Date()
             };
             localStorage.setItem('lastReceipt', JSON.stringify(receipt));
             
-            // Clear pending booking
+            
             localStorage.removeItem('pendingBooking');
 
-            // Redirect
+            
             window.location.href = 'confirmation.html';
         } else {
             throw new Error(data.message || 'Booking failed');

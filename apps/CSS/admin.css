@@ -1,4 +1,4 @@
-/* Modern Admin Panel Styles */
+
 
 .dashboard-section {
     background: var(--bg-surface);
@@ -17,7 +17,7 @@
     padding-bottom: 1rem;
 }
 
-/* Modern Table */
+
 table {
     width: 100%;
     border-collapse: separate;
@@ -53,7 +53,7 @@ tr:hover td {
     background-color: #FAFCFE;
 }
 
-/* Status Badges */
+
 .status-badge {
     padding: 0.4rem 1rem;
     border-radius: 30px;
@@ -69,7 +69,7 @@ tr:hover td {
 .status-completed { background: #EBF3FF; color: #2B3674; }
 .status-cancelled, .status-inactive { background: #FFF5F5; color: #EE5D50; }
 
-/* Action Buttons */
+
 .action-btn {
     padding: 6px 12px;
     border: none;
@@ -106,7 +106,7 @@ tr:hover td {
     transform: translateY(-2px);
 }
 
-/* Modal */
+
 .modal {
     display: none;
     position: fixed;

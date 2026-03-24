@@ -28,7 +28,7 @@ let currentRoomId;
 
 function initSignaling(roomId, onRemoteStream) {
     currentRoomId = roomId;
-    // Add skip browser warning for ngrok free tier
+    
     socket = io(window.SIGNALING_SERVER_URL || 'http://localhost:5506', {
         extraHeaders: {
             "ngrok-skip-browser-warning": "true"

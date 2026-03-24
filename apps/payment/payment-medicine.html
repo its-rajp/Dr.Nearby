@@ -79,7 +79,7 @@
       justify-content: center;
       gap: 0.5rem;
     }
-    /* Medicine Specific Styles */
+    
     .delivery-section {
         margin-bottom: 2rem;
     }
@@ -186,7 +186,7 @@
         const selected = document.querySelector(`input[value="${value}"]`);
         if(selected) selected.closest('.method-card').classList.add('selected');
         
-        // Update button text
+        
         const total = document.getElementById('totalAmount').textContent;
         const btn = document.getElementById('payBtn');
         if (value === 'cod') {
@@ -197,7 +197,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-        // Ensure user is logged in
+        
         if (typeof protectPage === 'function') {
             await protectPage();
         }
@@ -213,18 +213,18 @@
 
         document.getElementById('orderIdDisplay').textContent = orderId.substring(0, 8) + '...';
 
-        // Fetch order details
+        
         try {
             const response = await fetchWithAuth(`${API_BASE_URL}/orders/${orderId}`);
             const data = await response.json();
             
             if (data.success && data.order) {
-                // Calculate total from order items
+                
                 const total = data.order.medicines.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 document.getElementById('itemsTotal').textContent = '₹' + total.toFixed(2);
                 document.getElementById('totalAmount').textContent = total.toFixed(2);
                 
-                // Initialize button text
+                
                 document.getElementById('payBtn').textContent = `Pay ₹${total.toFixed(2)}`;
             } else {
                 showMessage('Failed to load order details', 'error');
@@ -245,7 +245,7 @@
                 return;
             }
 
-            // Disable button
+            
             const btn = document.getElementById('payBtn');
             const originalText = btn.textContent;
             btn.disabled = true;

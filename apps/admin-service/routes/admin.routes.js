@@ -13,10 +13,10 @@ import {
 
 const router = Router();
 
-// Public route
+
 router.post('/login', login);
 
-// Protected routes (require JWT middleware in production)
+
 router.get('/profile', getProfile);
 router.get('/users', getAllUsers);
 router.get('/doctors', getAllDoctors);

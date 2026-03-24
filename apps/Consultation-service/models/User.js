@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-// Encrypt password before saving
+
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
@@ -22,12 +22,12 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Match user entered password to hashed password in database
+
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Check if model exists before compiling to avoid OverwriteModelError
+
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export default User;

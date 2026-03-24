@@ -58,36 +58,65 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 1rem 2rem;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.8);
             border-radius: 50px;
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 20px;
-            z-index: 100;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
         .controls.hidden {
             opacity: 0;
             visibility: hidden;
+            transform: translate(-50%, 20px);
         }
         .control-btn {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
-            transition: all 0.3s;
+            font-size: 28px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .control-btn:active {
+            transform: scale(0.9);
         }
         .btn-mute { background: #444; color: white; }
         .btn-mute.off { background: #e74c3c; }
         .btn-video { background: #444; color: white; }
         .btn-video.off { background: #e74c3c; }
-        .btn-end { background: #e74c3c; color: white; width: 80px; border-radius: 30px; }
+        .btn-end { background: #e74c3c; color: white; width: 100px; border-radius: 35px; }
         .btn-end:hover { background: #c0392b; }
+        
+        
+        @media (max-width: 600px) {
+            .controls {
+                gap: 15px;
+                padding: 0.8rem 1.5rem;
+                bottom: 20px;
+            }
+            .control-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            .btn-end {
+                width: 80px;
+            }
+            #localVideo {
+                width: 120px;
+                top: 10px;
+                right: 10px;
+            }
+        }
         
         .status-overlay {
             position: absolute;
@@ -154,18 +183,25 @@
         const showControls = () => {
             controls.classList.remove('hidden');
             clearTimeout(hideControlsTimeout);
+            
             hideControlsTimeout = setTimeout(() => {
-                if (window.onRemoteStreamHandler && remoteVideo.srcObject) {
+                const remoteVideo = document.getElementById('remoteVideo');
+                if (remoteVideo && remoteVideo.srcObject) {
                     controls.classList.add('hidden');
                 }
-            }, 5000);
+            }, 8000); // 8 seconds is better for readability
         };
 
-        document.body.onclick = showControls;
-        document.body.onmousemove = showControls;
-        document.body.ontouchstart = showControls;
-        document.getElementById('videoContainer').onclick = showControls;
-        document.getElementById('videoContainer').ontouchstart = showControls;
+        
+        ['mousedown', 'mousemove', 'touchstart', 'click'].forEach(evt => {
+            document.addEventListener(evt, showControls, { passive: true });
+        });
+
+        
+        controls.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showControls();
+        });
 
         document.addEventListener('DOMContentLoaded', async () => {
             showControls();
@@ -226,7 +262,7 @@
             document.getElementById('endBtn').onclick = () => {
                 if (confirm('Are you sure you want to end this call?')) {
                     window.endCall();
-                    window.location.href = 'index.html';
+                    window.location.href = 'dashboard.html';
                 }
             };
         });

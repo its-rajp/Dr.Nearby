@@ -99,7 +99,7 @@
                 return;
             }
 
-            // Detect Role
+            
             const patientToken = localStorage.getItem('token');
             const doctorToken = localStorage.getItem('doctorToken');
             const token = doctorToken || patientToken;
@@ -112,7 +112,7 @@
             }
 
             try {
-                // Fetch Consultation Details
+                
                 const response = await fetch(`${API_BASE_URL}/consultations/${consultationId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -123,24 +123,24 @@
                 const consultation = data.consultation;
                 loader.style.display = 'none';
 
-                // Check if meeting has been joined before (Backend + LocalStorage)
-                // Backend 'HasJoined' now means 'Has Exhausted All Accesses (2)'
+                
+                
                 const backendExhausted = isDoctor ? consultation.doctorHasJoined : consultation.patientHasJoined;
                 
-                // Use a counter for local storage to support 2 accesses
+                
                 const storageKey = isDoctor ? `join_count_doctor_${consultationId}` : `join_count_patient_${consultationId}`;
                 const localCount = parseInt(localStorage.getItem(storageKey) || '0');
                 const localExhausted = localCount >= 2;
                 
                 const isExhausted = backendExhausted || localExhausted;
 
-                // Payment Option Removed - Payment is handled during pre-booking
+                
 
                 
-                // Helper to extract URL from text (handles cases where full invite is pasted)
+                
                 const extractUrl = (text) => {
                     if (!text) return '';
-                    // Look for http/https links
+                    
                     const urlRegex = /(https?:\/\/[^\s]+)/;
                     const match = text.match(urlRegex);
                     return match ? match[0] : text;
@@ -170,7 +170,7 @@
                         actionBtn.disabled = false;
                         
                         actionBtn.onclick = async () => {
-                            // Pre-open window to bypass popup blockers
+                            
                             const meetingWindow = window.open('', '_blank');
                             if (meetingWindow) {
                                 meetingWindow.document.write('<h1>Connecting to meeting...</h1><p>Please wait while we verify your access.</p>');
@@ -180,7 +180,7 @@
                                 actionBtn.textContent = 'Joining...';
                                 actionBtn.disabled = true;
 
-                                // Call Backend to Join
+                                
                                 const joinRes = await fetch(`${API_BASE_URL}/consultations/join`, {
                                     method: 'POST',
                                     headers: {
@@ -201,11 +201,11 @@
                                     return;
                                 }
 
-                                // Increment local count
+                                
                                 const newCount = localCount + 1;
                                 localStorage.setItem(storageKey, newCount.toString());
                                 
-                                // If the link is "webrtc", use our internal video call page
+                                
                                 if (cleanLink.toLowerCase() === 'webrtc' || cleanLink === 'internal') {
                                     if (meetingWindow) {
                                         meetingWindow.location.href = `video-call.html?room=${consultationId}&role=${isDoctor ? 'doctor' : 'patient'}`;
@@ -213,7 +213,7 @@
                                         window.location.href = `video-call.html?room=${consultationId}&role=${isDoctor ? 'doctor' : 'patient'}`;
                                     }
                                 } else {
-                                    // Otherwise, redirect to the provided external link
+                                    
                                     if (meetingWindow) {
                                         meetingWindow.location.href = cleanLink;
                                     } else {
@@ -221,7 +221,7 @@
                                     }
                                 }
 
-                                // Update UI Immediately
+                                
                                 actionBtn.textContent = 'Joined';
                                 actionBtn.classList.add('btn-disabled');
                                 actionBtn.classList.remove('btn-primary');
@@ -231,7 +231,7 @@
                                     ? 'You have already started this session. Access is limited to two times.'
                                     : 'You have already joined this session. Access is limited to two times.';
                                 
-                                // Reload page to ensure state persistence
+                                
                                 setTimeout(() => location.reload(), 1000);
                             } catch (err) {
                                 console.error('Join error:', err);

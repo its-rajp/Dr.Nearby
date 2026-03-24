@@ -8,7 +8,7 @@ export const protect = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dr_nearby_jwt_secret_v2_2025');
       
-      // Allow Admin and Super Admin
+      
       if (decoded.role === 'admin' || decoded.role === 'super_admin') {
         req.user = { _id: decoded.id, role: decoded.role };
         return next();
@@ -18,7 +18,7 @@ export const protect = async (req, res, next) => {
       if (!req.user) {
         return res.status(401).json({ success: false, message: 'Doctor not found' });
       }
-      // Add user ID to req for easy access
+      
       req.user.id = req.user._id;
       next();
     } catch (error) {

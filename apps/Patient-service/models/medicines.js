@@ -1,1 +1,0 @@
-// Moved to apps/js/medicines.js

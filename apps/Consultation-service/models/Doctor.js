@@ -27,14 +27,14 @@ const doctorSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
-// Hash password before saving
+
 doctorSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-// Check if model exists before compiling
+
 const Doctor = mongoose.models.Doctor || mongoose.model('Doctor', doctorSchema);
 
 export default Doctor;

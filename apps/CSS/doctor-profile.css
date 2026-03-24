@@ -1,4 +1,4 @@
-/* Modern Doctor Profile Styles */
+
 
 .doctor-profile-container {
   display: grid;
@@ -118,7 +118,7 @@
 
 .review-item:last-child { border-bottom: none; }
 
-/* Responsive */
+
 @media (max-width: 900px) {
   .doctor-profile-container {
     grid-template-columns: 1fr;

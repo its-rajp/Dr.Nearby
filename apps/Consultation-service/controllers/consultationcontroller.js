@@ -52,7 +52,7 @@ export const approveAppointment = async (req, res) => {
     const { appointmentId } = req.body;
     const appointment = await Appointment.findByIdAndUpdate(
       appointmentId,
-      { status: 'confirmed' }, // Changed from 'approved' to 'confirmed'
+      { status: 'confirmed' }, 
       { new: true }
     ).populate('patientId doctorId');
 
@@ -60,7 +60,7 @@ export const approveAppointment = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Appointment not found' });
     }
 
-    // Automatically create the consultation record if it doesn't exist
+    
     let consultation = await Consultation.findOne({ appointmentId: appointment._id });
     if (!consultation) {
         consultation = await Consultation.create({
@@ -79,7 +79,7 @@ export const approveAppointment = async (req, res) => {
         await consultation.save();
     }
 
-    // Notify Patient
+    
     await Notification.create({
       userId: appointment.patientId._id,
       title: 'Appointment Confirmed',
@@ -94,13 +94,13 @@ export const approveAppointment = async (req, res) => {
   }
 };
 
-// Appointment Management Functions
+
 export const completeConsultation = async (req, res) => {
   try {
     const { appointmentId } = req.body;
     if (!appointmentId) return res.status(400).json({ success: false, message: 'Appointment ID required' });
 
-    // Update Appointment
+    
     const appointment = await Appointment.findByIdAndUpdate(
       appointmentId,
       { status: 'completed', paymentStatus: 'settled' },
@@ -109,7 +109,7 @@ export const completeConsultation = async (req, res) => {
     
     if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
 
-    // Update Consultation if exists
+    
     await Consultation.findOneAndUpdate(
         { appointmentId: appointmentId },
         { status: 'completed' }
@@ -184,13 +184,13 @@ export const rejectAppointment = async (req, res) => {
 
 
 
-// Inferred Functions
+
 export const requestConsultation = async (req, res) => {
   try {
     console.log('Request Consultation Body:', JSON.stringify(req.body, null, 2));
     const { userId, doctorId, date, timeSlot, symptoms, paymentStatus, amount } = req.body;
 
-    // Security check: Only allow consultation requests that have been paid
+    
     if (paymentStatus !== 'paid') {
       return res.status(403).json({ 
         success: false, 
@@ -206,7 +206,7 @@ export const requestConsultation = async (req, res) => {
       time: timeSlot,
       reason: symptoms,
       status: 'pending',
-      consultationFee: amount || 500, // Fixed 500 Rs fee or from request
+      consultationFee: amount || 500, 
       paymentStatus: paymentStatus || 'pending'
     })).populate('patientId');
 
@@ -237,16 +237,25 @@ export const requestConsultation = async (req, res) => {
 
 export const getConsultations = async (req, res) => {
   try {
-    const { userId, doctorId } = req.query;
+    const { userId, doctorId, status } = req.query;
     const query = {};
     if (userId) query.userId = userId;
     if (doctorId) query.doctorId = doctorId;
+    if (status) query.status = status;
+    
+    console.log('[Consultation-Service] Fetching consultations with query:', query);
+    
     const consultations = await Consultation.find(query)
       .populate('userId', 'username email')
       .populate('doctorId', 'name specialization')
       .sort({ date: -1 });
+      
+    console.log(`[Consultation-Service] Found ${consultations.length} consultations`);
     res.json({ success: true, consultations });
-  } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+  } catch (error) { 
+    console.error('[Consultation-Service] Error fetching consultations:', error);
+    res.status(500).json({ success: false, message: error.message }); 
+  }
 };
 
 export const getConsultationById = async (req, res) => {
@@ -277,7 +286,7 @@ export const startConsultation = async (req, res) => {
 export const joinConsultation = async (req, res) => {
   try {
     const { consultationId, role } = req.body;
-    // Support both id (legacy/generic) and consultationId (frontend)
+    
     const id = consultationId || req.body.id;
 
     if (!id) return res.status(400).json({ success: false, message: 'Consultation ID is required' });
@@ -285,18 +294,18 @@ export const joinConsultation = async (req, res) => {
     const consultation = await Consultation.findById(id);
     if (!consultation) return res.status(404).json({ success: false, message: 'Not found' });
 
-    // Update joined status based on role
+    
     if (role === 'doctor') {
-        // Increment count (handle undefined/null by treating existing true as 1, false as 0)
+        
         let currentCount = consultation.doctorJoinCount || (consultation.doctorHasJoined ? 1 : 0);
         consultation.doctorJoinCount = currentCount + 1;
-        // Block only if count reaches 2
+        
         consultation.doctorHasJoined = consultation.doctorJoinCount >= 2;
     } else {
-        // Increment count
+        
         let currentCount = consultation.patientJoinCount || (consultation.patientHasJoined ? 1 : 0);
         consultation.patientJoinCount = currentCount + 1;
-        // Block only if count reaches 2
+        
         consultation.patientHasJoined = consultation.patientJoinCount >= 2;
     }
     await consultation.save();
@@ -313,7 +322,7 @@ export const getNotifications = async (req, res) => {
   } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 };
 
-// Functions from 500-600 block
+
 export const setMeetingLink = async (req, res) => {
   try {
     const { id } = req.params;
@@ -403,7 +412,7 @@ export const markAllNotificationsAsRead = async (req, res) => {
   }
 };
 
-// Functions from 680+ block
+
 export const createPrescription = async (req, res) => {
   try {
     const { patientId, doctorId, date, diagnosis, medicines, instructions } = req.body;
@@ -450,7 +459,7 @@ export const getPrescriptions = async (req, res) => {
   }
 };
 
-// Lab Test Functions
+
 export const getLabTests = async (req, res) => {
   try {
     const tests = await LabTest.find();
@@ -489,7 +498,7 @@ export const getLabBookingById = async (req, res) => {
   } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 };
 
-// Health Records
+
 export const createHealthRecord = async (req, res) => {
   try {
     const { userId, title, description, fileUrl, type, doctorId } = req.body;

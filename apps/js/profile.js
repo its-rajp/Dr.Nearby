@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('token');
   
   if (!token) {
-    window.location.href = 'user-login.html'; // Redirect to login if no token
+    window.location.href = 'user-login.html'; 
     return;
   }
 
-  // Elements from the new HTML structure
+  
   const profileDetails = document.getElementById('profile-details');
   const profileForm = document.getElementById('profile-form');
   const editProfileButton = document.getElementById('edit-profile-button');
@@ -17,11 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const uploadPhotoBtn = document.getElementById('upload-photo-btn');
   const photoUploadInput = document.getElementById('photo-upload-input');
 
-  // Load initial data
+  
   fetchProfile(token);
   fetchMedicalHistory(token);
 
-  // Toggle View/Edit Mode
+  
   if (editProfileButton) {
     editProfileButton.addEventListener('click', () => {
       profileDetails.style.display = 'none';
@@ -36,12 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Handle Form Submit
+  
   if (editForm) {
     editForm.addEventListener('submit', (e) => handleProfileUpdate(e, token));
   }
 
-  // Handle Profile Photo Upload
+  
   if (uploadPhotoBtn && photoUploadInput) {
       uploadPhotoBtn.addEventListener('click', () => {
           photoUploadInput.click();
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // Medical History Edit/Cancel buttons
+  
   const editMedicalHistoryButton = document.getElementById('edit-medical-history-button');
   const cancelMedicalHistoryButton = document.getElementById('cancel-medical-history-button');
   const medicalHistoryForm = document.getElementById('medicalHistoryForm');
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelMedicalHistoryButton.addEventListener('click', () => {
       if (medicalHistoryEdit) medicalHistoryEdit.style.display = 'none';
       if (medicalHistoryView) medicalHistoryView.style.display = 'block';
-      // Reload medical history to cancel changes
+      
       fetchMedicalHistory(token);
     });
   }
@@ -97,15 +97,15 @@ async function fetchProfile(token) {
     try {
       data = await response.json();
     } catch (jsonError) {
-      // If response is not JSON, show a generic error
+      
       showMessage(`Failed to load profile. Server returned status ${response.status}. Please try again.`, 'error');
       return;
     }
 
     if (!response.ok) {
-      // Handle HTTP error status codes (401, 404, 500, etc.)
+      
       if (response.status === 401) {
-        // Token expired or invalid, redirect to login
+        
         showMessage('Session expired. Please log in again.', 'error');
         setTimeout(() => {
           window.location.href = 'user-login.html';
@@ -119,7 +119,7 @@ async function fetchProfile(token) {
     if (data.success) {
       const user = data.user;
       
-      // Populate View Mode Elements (New IDs) with null checks
+      
       const displayName = document.getElementById('display-name');
       const displayEmail = document.getElementById('display-email');
       const displayPhone = document.getElementById('display-phone');
@@ -134,8 +134,8 @@ async function fetchProfile(token) {
         displayDob.textContent = user.dob ? new Date(user.dob).toLocaleDateString() : 'Not set';
       }
       if (displayBloodGroup) {
-          // Explicitly handle null, undefined, or empty string
-          // The backend might return it as undefined if not set, or string if set
+          
+          
           if (user.bloodGroup && user.bloodGroup !== 'undefined' && user.bloodGroup.trim() !== '') {
               displayBloodGroup.textContent = user.bloodGroup;
           } else {
@@ -143,12 +143,12 @@ async function fetchProfile(token) {
           }
       }
       if (displayPhoto && user.profileImage) {
-          // Adjust path if needed (e.g., if API returns relative path)
+          
           const imgUrl = user.profileImage.startsWith('http') ? user.profileImage : `${API_BASE_URL.replace('/api', '')}${user.profileImage}`;
           displayPhoto.src = imgUrl;
       }
 
-      // Populate Edit Form Fields (New IDs) with null checks
+      
       const editName = document.getElementById('edit-name');
       const editEmail = document.getElementById('edit-email');
       const editPhone = document.getElementById('edit-phone');
@@ -161,7 +161,7 @@ async function fetchProfile(token) {
       if (editBloodGroup) editBloodGroup.value = user.bloodGroup || '';
       
       if (user.dob && editDob) {
-        // Format date to YYYY-MM-DD for input type="date"
+        
         const date = new Date(user.dob);
         const formattedDate = date.toISOString().split('T')[0];
         editDob.value = formattedDate;
@@ -178,14 +178,14 @@ async function fetchProfile(token) {
 async function handleProfileUpdate(e, token) {
   e.preventDefault();
   
-  // Get form elements
+  
   const nameField = document.getElementById('edit-name');
   const emailField = document.getElementById('edit-email');
   const phoneField = document.getElementById('edit-phone');
   const dobField = document.getElementById('edit-dob');
   const bloodGroupField = document.getElementById('edit-blood-group');
 
-  // Validate required fields
+  
   if (!nameField || !emailField || !phoneField || !dobField) {
     showMessage('Error: Form fields not found. Please refresh the page.', 'error');
     return;
@@ -199,13 +199,13 @@ async function handleProfileUpdate(e, token) {
     bloodGroup: bloodGroupField ? bloodGroupField.value : undefined
   };
 
-  // Basic validation
+  
   if (!updatedData.username || !updatedData.email || !updatedData.phone || !updatedData.dob) {
     showMessage('Please fill all required fields.', 'error');
     return;
   }
 
-  // Email validation
+  
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(updatedData.email)) {
     showMessage('Please enter a valid email address.', 'error');
@@ -226,15 +226,15 @@ async function handleProfileUpdate(e, token) {
     try {
       data = await response.json();
     } catch (jsonError) {
-      // If response is not JSON, show a generic error
+      
       showMessage(`Failed to update profile. Server returned status ${response.status}. Please try again.`, 'error');
       return;
     }
 
     if (!response.ok) {
-      // Handle HTTP error status codes (400, 401, 409, 500, etc.)
+      
       if (response.status === 401) {
-        // Token expired or invalid, redirect to login
+        
         showMessage('Session expired. Please log in again.', 'error');
         setTimeout(() => {
           window.location.href = 'user-login.html';
@@ -247,9 +247,9 @@ async function handleProfileUpdate(e, token) {
 
     if (data.success) {
       showMessage('Profile updated successfully!', 'success');
-      await fetchProfile(token); // Refresh the view data
+      await fetchProfile(token); 
       
-      // Switch back to view mode with null checks
+      
       const profileForm = document.getElementById('profile-form');
       const profileDetails = document.getElementById('profile-details');
       if (profileForm) profileForm.style.display = 'none';
@@ -277,7 +277,7 @@ async function handlePhotoUpload(file, token) {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
-                // Content-Type not needed for FormData, browser sets it automatically
+                
             },
             body: formData
         });
@@ -286,7 +286,7 @@ async function handlePhotoUpload(file, token) {
 
         if (response.ok && data.success) {
             showMessage('Profile photo uploaded successfully!', 'success');
-            // Update the image immediately
+            
             const displayPhoto = document.getElementById('display-photo');
             if (displayPhoto) {
                  const imgUrl = data.imageUrl.startsWith('http') ? data.imageUrl : `${API_BASE_URL.replace('/api', '')}${data.imageUrl}`;
@@ -335,9 +335,9 @@ async function fetchMedicalHistory(token) {
     }
 
     if (data.success) {
-      const history = data.medicalHistory || {}; // Handle null history
+      const history = data.medicalHistory || {}; 
       
-      // Populate view mode
+      
       const displayAllergies = document.getElementById('display-allergies');
       const displayMedications = document.getElementById('display-medications');
       const displayConditions = document.getElementById('display-conditions');
@@ -352,7 +352,7 @@ async function fetchMedicalHistory(token) {
         displayConditions.textContent = history.pastConditions || 'None';
       }
 
-      // Populate edit form
+      
       const editAllergies = document.getElementById('edit-allergies');
       const editMedications = document.getElementById('edit-medications');
       const editConditions = document.getElementById('edit-conditions');
@@ -370,7 +370,7 @@ async function fetchMedicalHistory(token) {
 async function handleMedicalHistoryUpdate(e, token) {
   e.preventDefault();
 
-  // Use Gateway /api/medical-history (never relative or Patient port) so request reaches /patient/medical-history
+  
   const base = (typeof API_BASE_URL !== 'undefined' && API_BASE_URL) || (typeof window !== 'undefined' && window.API_BASE_URL) || 'http://localhost:5501/api';
   const baseStr = String(base || '').trim().replace(/\/$/, '');
   const url = (baseStr || 'http://localhost:5501/api') + '/medical-history';
@@ -426,9 +426,9 @@ async function handleMedicalHistoryUpdate(e, token) {
 
     if (data.success) {
       showMessage('Medical history updated successfully!', 'success');
-      await fetchMedicalHistory(token); // Refresh the view data
+      await fetchMedicalHistory(token); 
       
-      // Switch back to view mode
+      
       const medicalHistoryEdit = document.getElementById('medical-history-form');
       const medicalHistoryView = document.getElementById('medical-history-view');
       if (medicalHistoryEdit) medicalHistoryEdit.style.display = 'none';

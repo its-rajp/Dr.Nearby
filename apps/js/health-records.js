@@ -1,15 +1,15 @@
 
-    // Use 'let' or 'var' to avoid conflicts if script is reloaded or included multiple times
+    
     var HEALTH_RECORDS_API = (typeof API !== 'undefined' && API) || (typeof window !== 'undefined' && window.API_BASE_URL) || 'http://localhost:5501/api';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Ensure auth
+    
     if (typeof protectPage === 'function') {
         await protectPage();
     }
     
     loadHealthRecords();
-    loadDoctorsForUpload(); // Load doctors for the upload dropdown
+    loadDoctorsForUpload(); 
 
     const form = document.getElementById('uploadRecordForm');
     if (form) {
@@ -26,12 +26,12 @@ async function fetchDoctorsMap() {
         const response = await fetch(`${HEALTH_RECORDS_API}/doctor/list`);
         const data = await response.json();
         if (data.success && data.doctors) {
-            doctorsList = data.doctors; // Store full list for searching
+            doctorsList = data.doctors; 
             data.doctors.forEach(d => {
                 doctorsMap[d._id] = d.name;
                 doctorsMap[d.id] = d.name;
             });
-            return data.doctors; // Return list for dropdowns
+            return data.doctors; 
         }
     } catch (error) {
         console.error('Error fetching doctors map:', error);
@@ -41,7 +41,7 @@ async function fetchDoctorsMap() {
 
 // ... existing code ...
 
-// Share Functionality
+
 let currentRecordId = null;
 
 async function openShareModal(recordId, recordType) {
@@ -51,12 +51,12 @@ async function openShareModal(recordId, recordType) {
     title.textContent = `Sharing: ${formatType(recordType)}`;
     modal.style.display = 'block';
     
-    // Ensure doctors are loaded
+    
     if (doctorsList.length === 0) {
         await fetchDoctorsMap();
     }
     
-    // Reset search input
+    
     const searchInput = document.getElementById('doctorSearch');
     const hiddenId = document.getElementById('selectedDoctorId');
     const resultsDiv = document.getElementById('doctorSearchResults');
@@ -72,7 +72,7 @@ function searchDoctors(query) {
     const resultsDiv = document.getElementById('doctorSearchResults');
     const hiddenId = document.getElementById('selectedDoctorId');
     
-    // Clear selection if user types again
+    
     if (hiddenId) hiddenId.value = '';
 
     if (!query || query.trim().length === 0) {
@@ -125,7 +125,7 @@ async function loadDoctorsForUpload() {
     if (!select) return;
 
     try {
-        // Ensure doctors are loaded
+        
         if (doctorsList.length === 0) {
             await fetchDoctorsMap();
         }
@@ -162,7 +162,7 @@ async function confirmShare() {
         if (data.success) {
             alert('Document shared successfully!');
             closeShareModal();
-            loadHealthRecords(); // Reload to update shared list
+            loadHealthRecords(); 
         } else {
             alert(data.message || 'Sharing failed');
         }
@@ -172,7 +172,7 @@ async function confirmShare() {
     }
 }
 
-// Close modal if clicked outside
+
 window.onclick = function(event) {
     const modal = document.getElementById('shareModal');
     if (event.target == modal) {
@@ -213,7 +213,7 @@ async function handleUpload(e) {
 
     const formData = new FormData();
     formData.append('type', type);
-    // Combine title and description into notes as backend expects 'notes'
+    
     const fullNotes = title ? `${title}\n${description}` : description;
     formData.append('notes', fullNotes);
     formData.append('file', fileInput.files[0]);
@@ -227,7 +227,7 @@ async function handleUpload(e) {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
-                // Content-Type not set for FormData, browser sets it with boundary
+                
             },
             body: formData
         });
@@ -248,8 +248,8 @@ async function handleUpload(e) {
     }
 }
 
-// Helper for auth fetch if not in config
-// Re-implementing just in case it's missing or to be self-contained
+
+
 async function fetchWithAuth(url, options = {}) {
     const token = localStorage.getItem('token');
     const headers = {
@@ -258,7 +258,7 @@ async function fetchWithAuth(url, options = {}) {
         ...options.headers
     };
     
-    // If body is FormData, delete Content-Type to let browser handle boundary
+    
     if (options.body instanceof FormData) {
         delete headers['Content-Type'];
     }
@@ -269,7 +269,7 @@ async function fetchWithAuth(url, options = {}) {
     });
     
     if (response.status === 401) {
-        // Optional: redirect to login
+        
         // window.location.href = 'user-login.html';
     }
     

@@ -27,7 +27,7 @@ async function scanDatabase() {
         const samples = await mongoose.connection.db.collection(col.name).find().limit(3).toArray();
         console.log('Sample documents:');
         samples.forEach(doc => {
-          // Truncate long fields for readability
+          
           const printable = { ...doc };
           if (printable.password) printable.password = printable.password.substring(0, 15) + '...';
           console.log(JSON.stringify(printable, null, 2));

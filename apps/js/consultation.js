@@ -20,15 +20,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadDoctors() {
     try {
-        const res = await fetch(`${API}/doctor/list`); // Using correct endpoint from search.js
-        // If /doctors doesn't exist, we might need /admin/doctors or similar. 
-        // But let's assume public doctor list is available.
-        // If not, we might fail to load doctors. 
-        // Let's try to use the one from search.js if this fails?
-        // Actually, search-doctor.html uses search.js.
-        // Let's assume /doctors works or check search.js
+        const res = await fetch(`${API}/doctor/list`); 
+        
+        
+        
+        
+        
+        
         if (!res.ok) {
-             // Fallback or error
+             
              console.log('Failed to load doctors');
              return;
         }
@@ -49,7 +49,7 @@ async function loadNotifications() {
     const userId = user._id || user.id;
 
     try {
-        // Fetch scheduled appointments to show as notifications
+        
         const res = await fetch(`${API}/consultations?userId=${userId}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
@@ -57,7 +57,7 @@ async function loadNotifications() {
         const list = document.getElementById('notificationsList');
         
         if (data.success && data.consultations) {
-            // Filter for scheduled/active meetings
+            
             const notifications = data.consultations.filter(c => c.status === 'scheduled' || c.status === 'active');
             
             if (notifications.length > 0) {
@@ -92,7 +92,7 @@ async function loadMyConsultations() {
     }
 
     try {
-        // Use userId query param as expected by backend
+        
         const res = await fetch(`${API}/consultations?userId=${userId}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
@@ -141,7 +141,7 @@ async function handleConsultationRequest(e) {
         return;
     }
 
-    // Store data for after payment
+    
     pendingConsultationData = {
         userId: user._id || user.id,
         doctorId,
@@ -152,7 +152,7 @@ async function handleConsultationRequest(e) {
         amount: 500
     };
 
-    // Show the payment modal
+    
     document.getElementById('paymentModal').style.display = 'block';
     document.getElementById('paymentOptions').style.display = 'block';
     document.getElementById('paymentProcessing').style.display = 'none';
@@ -205,7 +205,7 @@ function closePaymentModal() {
     pendingConsultationData = null;
 }
 
-// Expose to window for HTML onclick handlers
+
 window.processPayment = processPayment;
 window.closePaymentModal = closePaymentModal;
 

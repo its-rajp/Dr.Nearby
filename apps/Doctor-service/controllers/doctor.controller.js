@@ -17,12 +17,12 @@ export const registerDoctor = async (req, res) => {
   try {
     const { name, email, password, phone, dob, gender, specialization, hospital, address, city, state, zipCode, licenseNumber, experience, qualification, languages } = req.body;
 
-    // Validate required fields
+    
     if (!name || !email || !password || !phone || !dob || !gender || !specialization || !hospital || !address || !city || !state || !licenseNumber || !experience || !qualification) {
       return res.status(400).json({ success: false, message: 'Please fill all required fields including location details.' });
     }
 
-    // Check if doctor already exists
+    
     const existingDoctor = await Doctor.findOne({ $or: [{ email }, { licenseNumber }] });
     if (existingDoctor) {
       return res.status(409).json({ success: false, message: 'Doctor with this email or license number already exists.' });
@@ -51,7 +51,7 @@ export const registerDoctor = async (req, res) => {
 
     const token = generateToken(doctor._id);
     
-    // Return doctor data (without password)
+    
     const doctorData = doctor.toObject();
     delete doctorData.password;
 
@@ -76,7 +76,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email and password are required.' });
     }
 
-    // Find doctor by email or name (case insensitive)
+    
     const doctor = await Doctor.findOne({
       $or: [
         { email: { $regex: new RegExp(`^${email}$`, 'i') } },
@@ -90,7 +90,7 @@ export const login = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials.' });
     }
 
-    // Check if doctor exists and compare password
+    
     let isMatch = false;
     
     // 1. Try plain text comparison first (User Request: "as it is feeded")
@@ -111,7 +111,7 @@ export const login = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials.' });
     }
 
-    // Update last login
+    
     doctor.lastLogin = new Date();
     await doctor.save();
 
@@ -176,7 +176,7 @@ export const updateDoctorProfile = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Doctor not found.' });
     }
 
-    // Update allowed fields
+    
     const allowedUpdates = ['name', 'phone', 'specialization', 'hospital', 'location', 'experience', 'qualification', 'languages', 'email'];
     
     allowedUpdates.forEach(field => {
@@ -185,7 +185,7 @@ export const updateDoctorProfile = async (req, res) => {
       }
     });
 
-    // Special handling for nested location if provided partially
+    
     if (req.body.location) {
       doctor.location = { ...doctor.location.toObject(), ...req.body.location };
     }
@@ -223,9 +223,9 @@ export const resetPassword = async (req, res) => {
     const { id } = req.params;
     const { password } = req.body;
 
-    // Check if user is authorized (Admin or Super Admin)
-    // The protect middleware already sets req.user.role if it's an admin token
-    // But we should double check here to be explicit, though middleware handles it.
+    
+    
+    
     if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
          return res.status(403).json({ success: false, message: 'Not authorized to reset passwords.' });
     }
@@ -275,7 +275,7 @@ export const adminUpdateDoctor = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    // Check if user is authorized (Admin or Super Admin)
+    
     if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
          return res.status(403).json({ success: false, message: 'Not authorized.' });
     }
@@ -285,7 +285,7 @@ export const adminUpdateDoctor = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Doctor not found.' });
     }
 
-    // Allow updating specific fields
+    
     if (updates.isActive !== undefined) doctor.isActive = updates.isActive;
     if (updates.name) doctor.name = updates.name;
     if (updates.email) doctor.email = updates.email;

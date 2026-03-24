@@ -10,7 +10,7 @@ const generateToken = (id, role) => {
   });
 };
 
-// Admin Login
+
 export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -46,7 +46,7 @@ export const login = async (req, res) => {
       });
     }
 
-    // Update last login
+    
     admin.lastLogin = new Date();
     await admin.save();
 
@@ -67,10 +67,10 @@ export const login = async (req, res) => {
   }
 };
 
-// Get Admin Profile
+
 export const getProfile = async (req, res) => {
-  // In production: verify JWT and extract admin ID from req.user
-  const adminId = req.query.adminId; // Simplified for demo
+  
+  const adminId = req.query.adminId; 
   try {
     const admin = await Admin.findById(adminId).select('-password');
     if (!admin) {
@@ -82,14 +82,14 @@ export const getProfile = async (req, res) => {
   }
 };
 
-// Get All Users - Fetch from Patient Service via API Gateway
+
 export const getAllUsers = async (req, res) => {
   try {
-    // Use API Gateway or direct service call
+    
     const PATIENT_SERVICE_PORT = process.env.PATIENT_SERVICE_PORT || 5502;
     const API_GATEWAY_PORT = process.env.API_GATEWAY_PORT || 5501;
     
-    // Try API Gateway first, fallback to direct service
+    
     let response;
     try {
       response = await fetch(`http://127.0.0.1:${API_GATEWAY_PORT}/api/patients/users`, {
@@ -97,7 +97,7 @@ export const getAllUsers = async (req, res) => {
         headers: { 'Content-Type': 'application/json' }
       });
     } catch (e) {
-      // Fallback to direct service
+      
       response = await fetch(`http://127.0.0.1:${PATIENT_SERVICE_PORT}/patient/users`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
@@ -108,7 +108,7 @@ export const getAllUsers = async (req, res) => {
       const data = await response.json();
       res.json({ success: true, users: data.users || [] });
     } else {
-      // Fallback to empty array if service unavailable
+      
       res.json({ success: true, users: [] });
     }
   } catch (error) {
@@ -117,14 +117,14 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// Get All Doctors - Fetch from Doctor Service via API Gateway
+
 export const getAllDoctors = async (req, res) => {
   try {
-    // Use API Gateway or direct service call
+    
     const DOCTOR_SERVICE_PORT = process.env.DOCTOR_SERVICE_PORT || 5503;
     const API_GATEWAY_PORT = process.env.API_GATEWAY_PORT || 5501;
     
-    // Try API Gateway first, fallback to direct service
+    
     let response;
     try {
       response = await fetch(`http://127.0.0.1:${API_GATEWAY_PORT}/api/doctor/list`, {
@@ -132,7 +132,7 @@ export const getAllDoctors = async (req, res) => {
         headers: { 'Content-Type': 'application/json' }
       });
     } catch (e) {
-      // Fallback to direct service
+      
       response = await fetch(`http://127.0.0.1:${DOCTOR_SERVICE_PORT}/doctor/list`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
@@ -143,7 +143,7 @@ export const getAllDoctors = async (req, res) => {
       const data = await response.json();
       res.json({ success: true, doctors: data.doctors || [] });
     } else {
-      // Fallback to empty array if service unavailable
+      
       res.json({ success: true, doctors: [] });
     }
   } catch (error) {
@@ -152,7 +152,7 @@ export const getAllDoctors = async (req, res) => {
   }
 };
 
-// Create User (Mock integration)
+
 export const createUser = async (req, res) => {
   const { name, email, role } = req.body;
   res.json({
@@ -162,7 +162,7 @@ export const createUser = async (req, res) => {
   });
 };
 
-// Update User
+
 export const updateUser = async (req, res) => {
   const { id } = req.params;
   
@@ -172,9 +172,9 @@ export const updateUser = async (req, res) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        // Forward admin token or use internal secret if needed. 
-        // For now assuming we pass the auth header from request or rely on service trust (but patient service checks token)
-        // We should forward the token from the incoming request
+        
+        
+        
         'Authorization': req.headers.authorization || '' 
       },
       body: JSON.stringify(req.body)
@@ -218,7 +218,7 @@ export const updateDoctor = async (req, res) => {
   }
 };
 
-// Delete User
+
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
   res.json({

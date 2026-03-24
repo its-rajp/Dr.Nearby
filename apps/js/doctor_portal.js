@@ -1,6 +1,6 @@
 // dr-nearby/js/doctor-portal.js
 
-// Get API base URL from config - ensure it's available
+
 let API_BASE;
 function getApiBase() {
   if (API_BASE) return API_BASE;
@@ -123,7 +123,7 @@ function doctorLogout() {
     localStorage.removeItem('doctorToken');
     localStorage.removeItem('doctorEmail');
     localStorage.removeItem('doctorData');
-    // Clear others just in case
+    
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('adminToken');
@@ -182,7 +182,7 @@ function showMessage(message, type = 'error') {
         messageDiv.textContent = message;
         messageDiv.className = type;
         messageDiv.style.display = 'block';
-        // Apply consistent styling (matches auth.js)
+        
         messageDiv.style.color = type === 'success' ? 'green' : 'red';
         messageDiv.style.backgroundColor = type === 'success' 
             ? '#d4edda' 
@@ -198,7 +198,7 @@ function initDoctorLoginForm() {
         return;
     }
     
-    // Remove any existing listeners to avoid duplicates
+    
     const newForm = form.cloneNode(true);
     form.parentNode.replaceChild(newForm, form);
     
@@ -211,7 +211,7 @@ function initDoctorLoginForm() {
             return;
         }
         
-        // Show loading
+        
         const msgDiv = document.getElementById('message');
         if (msgDiv) {
             msgDiv.textContent = 'Logging in...';
@@ -242,13 +242,13 @@ function initDoctorRegisterForm() {
     if (!form) return;
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        // Registration handled inline in doctor-register.html
-        // But you can move logic here if preferred
+        
+        
     });
 }
 
 // ─── INITIALIZE ON LOAD ───────────────────────────────────
-// Use both DOMContentLoaded and load events for better compatibility
+
 function initializeForms() {
     try {
         initDoctorLoginForm();
@@ -265,9 +265,9 @@ if (document.readyState === 'loading') {
     initializeForms();
 }
 
-// Also try on window load as fallback
+
 window.addEventListener('load', () => {
-    // Re-initialize if forms weren't initialized
+    
     const loginForm = document.getElementById('doctorLoginForm');
     if (loginForm && !loginForm.hasAttribute('data-initialized')) {
         loginForm.setAttribute('data-initialized', 'true');

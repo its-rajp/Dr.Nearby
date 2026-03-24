@@ -7,7 +7,7 @@ export const getPatientProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
     if (user) {
-      // Ensure password is excluded (double-check)
+      
       const userObj = user.toObject();
       delete userObj.password;
       res.json({ success: true, user: userObj });
@@ -50,10 +50,10 @@ export const updatePatientProfile = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // Validate input
+    
     const { username, email, phone, dob, bloodGroup } = req.body;
 
-    // Update fields only if provided
+    
     if (username !== undefined) {
       if (!username || username.trim().length === 0) {
         return res.status(400).json({ success: false, message: 'Username cannot be empty.' });
@@ -66,13 +66,13 @@ export const updatePatientProfile = async (req, res) => {
     }
 
     if (email !== undefined) {
-      // Validate email format
+      
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!email || !emailRegex.test(email)) {
         return res.status(400).json({ success: false, message: 'Invalid email format.' });
       }
       
-      // Check if email is already taken by another user
+      
       const existingUser = await User.findOne({ email: email.trim(), _id: { $ne: user._id } });
       if (existingUser) {
         return res.status(409).json({ success: false, message: 'Email is already in use by another account.' });
@@ -89,18 +89,18 @@ export const updatePatientProfile = async (req, res) => {
     }
 
     if (dob !== undefined) {
-      // Validate date of birth (required field)
+      
       if (!dob || dob.trim() === '') {
         return res.status(400).json({ success: false, message: 'Date of birth is required.' });
       }
       
-      // Convert string date to Date object
+      
       const dateObj = new Date(dob);
       if (isNaN(dateObj.getTime())) {
         return res.status(400).json({ success: false, message: 'Invalid date format.' });
       }
       
-      // Validate that date is not in the future
+      
       if (dateObj > new Date()) {
         return res.status(400).json({ success: false, message: 'Date of birth cannot be in the future.' });
       }
@@ -110,7 +110,7 @@ export const updatePatientProfile = async (req, res) => {
 
     const updatedUser = await user.save();
 
-    // Return user without password
+    
     const userResponse = updatedUser.toObject();
     delete userResponse.password;
 
@@ -118,7 +118,7 @@ export const updatePatientProfile = async (req, res) => {
   } catch (error) {
     console.error('Error updating profile:', error);
     
-    // Handle duplicate key error (MongoDB)
+    
     if (error.code === 11000) {
       return res.status(409).json({ success: false, message: 'Email is already in use by another account.' });
     }
@@ -133,19 +133,19 @@ export const getMedicalHistory = async (req, res) => {
     try {
         let userId = req.user._id;
 
-        // If ID param is provided and user is authorized (doctor/admin), use that ID
+        
         if (req.params.userId) {
              if (req.doctor || req.user.role === 'admin' || req.user.role === 'super_admin') {
                  userId = req.params.userId;
              } else {
-                 // Regular users can only see their own
+                 
                  return res.status(403).json({ success: false, message: 'Unauthorized' });
              }
         }
 
         const medicalHistory = await MedicalHistory.findOne({ userId: userId });
         if (!medicalHistory) {
-            // Return empty object instead of 404 to allow rendering "No history available"
+            
             return res.json({ success: true, medicalHistory: null });
         }
         res.json({ success: true, medicalHistory });
@@ -162,13 +162,13 @@ export const updateMedicalHistory = async (req, res) => {
         let medicalHistory = await MedicalHistory.findOne({ userId: req.user._id });
 
         if (!medicalHistory) {
-            // Create new if doesn't exist
+            
             medicalHistory = new MedicalHistory({
                 userId: req.user._id,
                 ...req.body
             });
         } else {
-            // Update existing
+            
             Object.assign(medicalHistory, req.body);
         }
 
@@ -187,7 +187,7 @@ export const resetPassword = async (req, res) => {
     const { id } = req.params;
     const { password } = req.body;
 
-    // Authorization check
+    
     if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
       return res.status(403).json({ success: false, message: 'Not authorized to reset passwords.' });
     }
@@ -202,7 +202,7 @@ export const resetPassword = async (req, res) => {
     }
 
     user.password = password;
-    await user.save(); // Triggers pre-save hook to hash password
+    await user.save(); 
 
     res.json({ success: true, message: 'Password reset successfully.' });
   } catch (error) {
@@ -218,7 +218,7 @@ export const adminUpdateUser = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
     
-    // Authorization check
+    
     if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
       return res.status(403).json({ success: false, message: 'Not authorized.' });
     }
@@ -228,7 +228,7 @@ export const adminUpdateUser = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found.' });
     }
 
-    // Allow updating specific fields
+    
     if (updates.isActive !== undefined) user.isActive = updates.isActive;
     if (updates.email) user.email = updates.email;
     if (updates.username) user.username = updates.username;

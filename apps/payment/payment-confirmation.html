@@ -84,7 +84,7 @@
   <header>
     <h1>Dr.Nearby</h1>
     <nav>
-      <a href="../index.html">Home</a>
+      <a href="../dashboard.html">Home</a>
     </nav>
   </header>
 
@@ -147,7 +147,7 @@
         </div>
       </div>
 
-      <a href="../index.html" class="btn-home">Back to Dashboard</a>
+      <a href="../dashboard.html" class="btn-home">Back to Dashboard</a>
     </div>
   </main>
 
@@ -159,7 +159,7 @@
   <script src="../js/auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-        // Ensure auth
+        
         if (typeof protectPage === 'function') {
             await protectPage();
         }
@@ -169,7 +169,7 @@
 
         if (!orderId) {
             alert('No Order ID found');
-            window.location.href = '../index.html';
+            window.location.href = '../dashboard.html';
             return;
         }
 
@@ -180,7 +180,7 @@
             if (data.success && data.order) {
                 const order = data.order;
                 
-                // Populate fields
+                
                 document.getElementById('transactionId').textContent = order.transactionId || 'Pending';
                 document.getElementById('orderId').textContent = order._id;
                 document.getElementById('orderDate').textContent = new Date(order.createdAt).toLocaleDateString();
@@ -197,7 +197,7 @@
 
                 document.getElementById('userName').textContent = order.userId ? order.userId.name : 'User';
 
-                // Populate Medicines
+                
                 const container = document.getElementById('medicinesContainer');
                 container.innerHTML = '';
                 

@@ -5,7 +5,7 @@ const medicalHistorySchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
-    unique: true // One medical history per user
+    unique: true 
   },
   allergies: {
     type: String,

@@ -13,7 +13,7 @@ const prescriptionSchema = new mongoose.Schema({
   instructions: { type: String, default: '' }
 }, { timestamps: true });
 
-// Index for faster queries
+
 prescriptionSchema.index({ doctorId: 1, date: -1 });
 prescriptionSchema.index({ patientId: 1, date: -1 });
 
