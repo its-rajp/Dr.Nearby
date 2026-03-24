@@ -35,6 +35,12 @@ const onProxyError = (err, req, res) => {
   res.status(502).json({ success: false, message: 'Service unavailable. The backend service is likely down.', error: err.message });
 };
 
+const patientServiceTarget = process.env.PATIENT_SERVICE_URL || `http://127.0.0.1:${process.env.PATIENT_SERVICE_PORT || 5502}`;
+const doctorServiceTarget = process.env.DOCTOR_SERVICE_URL || `http://127.0.0.1:${process.env.DOCTOR_SERVICE_PORT || 5503}`;
+const adminServiceTarget = process.env.ADMIN_SERVICE_URL || `http://127.0.0.1:${process.env.ADMIN_SERVICE_PORT || 5504}`;
+const consultationServiceTarget = process.env.CONSULTATION_SERVICE_URL || `http://127.0.0.1:${process.env.CONSULTATION_SERVICE_PORT || 5505}`;
+
+
 
 app.use('/api/profile/:id', (req, res, next) => {
   const { id } = req.params;
@@ -73,7 +79,7 @@ app.use('/api/profile/:id', (req, res, next) => {
 app.use(
   ['/api/auth', '/api/patients', '/api/patient', '/api/medical-history', '/api/health-records', '/api/medicines', '/api/orders', '/api/payments/medicines'],
   createProxyMiddleware({
-    target: `http://127.0.0.1:${process.env.PATIENT_SERVICE_PORT || 5502}`,
+    target: patientServiceTarget,
     changeOrigin: true,
     pathRewrite: (path, req) => {
       const url = req.originalUrl || req.url || path || '';
@@ -140,7 +146,7 @@ app.use('/uploads', createProxyMiddleware({
 
 
 app.use(['/api/doctor', '/api/doctors'], createProxyMiddleware({
-  target: `http://127.0.0.1:${process.env.DOCTOR_SERVICE_PORT || 5503}`,
+  target: doctorServiceTarget,
   changeOrigin: true,
   pathRewrite: (path, req) => {
     const url = req.originalUrl || req.url || path || '';
@@ -179,7 +185,7 @@ app.use(['/api/doctor', '/api/doctors'], createProxyMiddleware({
 app.use(
   '/api/admin',
   createProxyMiddleware({
-    target: `http://127.0.0.1:${process.env.ADMIN_SERVICE_PORT || 5504}`,
+    target: adminServiceTarget,
     changeOrigin: true,
     pathRewrite: (path, req) => req.originalUrl.replace('/api/admin', '/admin'),
     onError: onProxyError
@@ -189,7 +195,7 @@ app.use(
 app.use(
   ['/api/appointments', '/api/consultations', '/api/notifications', '/api/prescriptions', '/api/lab-tests', '/api/payments'],
   createProxyMiddleware({
-    target: `http://127.0.0.1:${process.env.CONSULTATION_SERVICE_PORT || 5505}`,
+    target: consultationServiceTarget,
     changeOrigin: true,
     pathRewrite: (path, req) => {
       const url = req.originalUrl || req.url || path || '';
